@@ -1,45 +1,13 @@
-<img src="./docs/logo_black.png" width="200">
+# 前言
 
-## Source code for DeepO, A deep-learning-based query optimizer.
+> 本仓库来自[RUC-AIDB/DeepO](https://github.com/RUC-AIDB/DeepO), 在保留作者原本意图基础上做了一些小修改, 以符合自己的开发习惯
+> 全是私货, 想学习原滋原味的DeepO, 请到作者仓库[RUC-AIDB/DeepO](https://github.com/RUC-AIDB/DeepO)
+> 1. 改用PIP安装各种第三方库
+> 2. 符合PEP8代码标准
+> 3. 减少重复代码量
+> 以下为施工日志
 
-### Introduction
+## 2022/10/18 准备工作
 
-DeepO is a learning-based query optimizer that offers  high-quality and fine-grained optimization to user queries. We implement DeepO and incorporate it into [PostgreSQL](https://www.postgresql.org/ftp/source/v12.4/), and we also provide with a [web UI](https://github.com/RUC-AIDB/DeepO.Demo), where users can carry out the optimization operations interactively and evaluate the optimization performance.
-
----
-
-### How to Setup
-#### Requirements
-- PostgreSQL installed with [pg_hint_plan](https://pghintplan.osdn.jp/pg_hint_plan.html) extension.
-- [JOB](https://github.com/concretevitamin/join-order-benchmark) dataset downloaded and loaded into PostgreSQL.
-- Create the virtual environment and activate it
-  ```
-  conda env create -f environment.yml
-  conda activate deepo
-  ```
-
-#### System configuration
-- Set the connection configuration of PostgreSQL in ```./src/get_plan```
-
-#### Run DeepO
-
-- Use following commands if you want to train your own Cost Learner.
-    ```
-    # Generate scan embedding intermediate result
-    python scan_embedding.py
-    # embedding plan into sequence
-    python plan_to_seq.py
-    # train the Cost Learner
-    python cost_learning.py
-    # evaluate the learning performance
-    python cost_evaluation.py
-    ```
-- Use following commands to estimate cost and optimize new queries.
-    ```
-    python cost_estimation.py
-    python hint_generation.py
-    # The optimized queries will be saved in /data/SQL_with_hint
-    ```
----
-### Questions
-This repository is still under development, contact Luming Sun (sunluming@ruc.edu.cn) if you have any questions.
+[x] 拜读作者论文
+[x] 下载源码，建立自己仓库
