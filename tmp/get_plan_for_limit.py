@@ -3,7 +3,7 @@ import os
 from get_plan import get_query_plan
 
 # %%
-with open("../example/SQL_with_hint/0", "r") as f:
+with open("../data/SQL_with_hint/0", "r") as f:
     queries_with_hint = f.readlines()
 
 # %%

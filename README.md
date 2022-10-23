@@ -5,7 +5,7 @@
 > 1. 改用PIP安装各种第三方库
 > 2. 符合PEP8代码标准
 > 3. 减少重复代码量
-> 以下为施工日志
+     > 以下为施工日志
 
 ## 2022/10/18 准备工作
 
@@ -14,7 +14,7 @@
 
 ## 2022/10/22 阅读源码
 
->> 按照作者的思路, 应当按照一下思路训练自己的代价学习器
+> > 按照作者的思路, 应当按照一下思路训练自己的代价学习器
 
 ```shell
 # Generate scan embedding intermediate result
@@ -29,3 +29,11 @@ python cost_learning.py
 # evaluate the learning performance
 python cost_evaluation.py
 ```
+
+## 2022/10/23 阅读源码
+
+> > 已完成以下文件的研究, 应该是为了获取优化后的查询计划
+
+1. `tmp/get_plan.py`
+2. `tmp/tmp_for_example.py`
+3. `tmp/get_plan_for_limit.py`

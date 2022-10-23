@@ -50,9 +50,9 @@ def normalize_data(val, column_name, column_min_max_vals):
     min_val = column_min_max_vals[column_name][0]
     max_val = column_min_max_vals[column_name][1]
     val = float(val)
-    if (val > max_val):
+    if val > max_val:
         val = max_val
-    elif (val < min_val):
+    elif val < min_val:
         val = min_val
     val = float(val)
     val_norm = (val - min_val) / (max_val - min_val)
@@ -84,15 +84,15 @@ def get_data_and_label(path):
         with open(path + '/' + file, 'r') as f:
             plan = f.readlines()
             for i in range(len(plan) - 2):
-                if ("Seq Scan" in plan[i]):
+                if "Seq Scan" in plan[i]:
                     _start_cost, _end_cost, _rows, _width, _a_start_cost_, _a_end_cost, _a_rows = extract_time(plan[i])
-                    if (len(plan[i].strip().split("  ")) == 2):
+                    if len(plan[i].strip().split("  ")) == 2:
                         _sentence = " ".join(plan[i].strip().split("  ")[0].split(" ")[:-1]) + " "
                         table = plan[i].strip().split("  ")[0].split(" ")[4]
                     else:
                         _sentence = " ".join(plan[i].strip().split("  ")[1].split(" ")[:-1]) + " "
                         table = plan[i].strip().split("  ")[1].split(" ")[4]
-                    if ("actual" not in plan[i + 1] and "Plan" not in plan[i + 1]):
+                    if "actual" not in plan[i + 1] and "Plan" not in plan[i + 1]:
                         _sentence += plan[i + 1].strip()
                     else:
                         _sentence += table
@@ -144,7 +144,7 @@ def prepare_data_and_label(sentences, rows):
 
 
 def normalize_labels(labels, min_val=None, max_val=None):
-    # log tranformation withour normalize
+    # log transformation without normalize
     labels = np.array([np.log(float(l)) for l in labels]).astype(np.float32)
     return labels, 0, 1
 
@@ -160,7 +160,7 @@ sentences, rows, pg = get_data_and_label(plan_path)
 vocabulary = []
 for sentence in sentences:
     for word in sentence:
-        if (word not in vocabulary and is_not_number(word)):
+        if word not in vocabulary and is_not_number(word):
             vocabulary.append(word)
 # print(len(vocabulary))
 vocab_size = len(vocabulary)
