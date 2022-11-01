@@ -9,14 +9,14 @@ from blitz.modules import BayesianLSTM
 from blitz.utils import variational_estimator
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from joblib import dump, load
 
 # %%
 
-with open("../data/job-cardinality-sequence.pkl","rb") as f:
+with open("../data/job-cardinality-sequence.pkl", "rb") as f:
     sequences = pickle.load(f)
-cost_label = np.load("../data/cost_label.npy").reshape(-1,1)
+cost_label = np.load("../data/cost_label.npy").reshape(-1, 1)
 print("Data loaded.")
 # %%
 sc = MinMaxScaler()
@@ -25,22 +25,21 @@ dump(sc, '../model/std_scaler.bin', compress=True)
 # %%
 max_length = 0
 for sequence in sequences:
-    if(np.shape(sequence)[0]>max_length):
+    if (np.shape(sequence)[0] > max_length):
         max_length = np.shape(sequence)[0]
 # %%
 padded_sequences = []
 for seq in sequences:
-    if(len(seq))<max_length:
-        tmp = [[0] * 79] * (max_length-len(seq))
+    if (len(seq)) < max_length:
+        tmp = [[0] * 79] * (max_length - len(seq))
         tmp.extend(seq)
         padded_sequences.append(tmp)
     else:
         padded_sequences.append(seq)
 padded_sequences = np.array(padded_sequences)
 # %%
-padded_sequences = torch.tensor(padded_sequences,dtype=torch.float32)
-cost_label = torch.tensor(cost_label,dtype=torch.float32)
-
+padded_sequences = torch.tensor(padded_sequences, dtype=torch.float32)
+cost_label = torch.tensor(cost_label, dtype=torch.float32)
 
 # %%
 X_train, X_test, y_train, y_test = train_test_split(padded_sequences,
@@ -50,7 +49,8 @@ X_train, X_test, y_train, y_test = train_test_split(padded_sequences,
                                                     shuffle=False)
 
 ds = torch.utils.data.TensorDataset(X_train, y_train)
-dataloader_train = torch.utils.data.DataLoader(ds, batch_size=64, shuffle=True)    
+dataloader_train = torch.utils.data.DataLoader(ds, batch_size=64, shuffle=True)
+
 
 # %%
 @variational_estimator
@@ -60,13 +60,13 @@ class NN(nn.Module):
         self.relu = nn.ReLU()
         self.lstm_1 = BayesianLSTM(79, 32, prior_sigma_1=1, prior_pi=1, posterior_rho_init=-3.0)
         self.linear_1 = nn.Linear(32, 16)
-        self.linear_2 = nn.Linear(16,1)
+        self.linear_2 = nn.Linear(16, 1)
         self.drop_out = nn.Dropout(0.2)
-            
+
     def forward(self, x):
         x_, _ = self.lstm_1(x)
-        
-        #gathering only the latent end-of-sequence for the linear layer
+
+        # gathering only the latent end-of-sequence for the linear layer
         x_ = x_[:, -1, :]
         x_ = self.relu(x_)
         x_ = self.linear_1(x_)
@@ -74,6 +74,8 @@ class NN(nn.Module):
         x_ = self.drop_out(x_)
         x_ = self.linear_2(x_)
         return x_
+
+
 # %%
 net = NN()
 net = net.float()
@@ -85,23 +87,24 @@ epochs = 50
 for epoch in range(epochs):
     for i, (datapoints, labels) in enumerate(dataloader_train):
         optimizer.zero_grad()
-        
+
         loss = net.sample_elbo(inputs=datapoints,
                                labels=labels,
                                criterion=criterion,
                                sample_nbr=3,
-                               complexity_cost_weight=1/X_train.shape[0])
+                               complexity_cost_weight=1 / X_train.shape[0])
         loss.backward()
         optimizer.step()
-        
-        iteration += 1
-        if iteration%250==0:
-            preds_test = net(X_test)
-            preds_test = preds_test[:,0].unsqueeze(1)
-            loss_test = criterion(preds_test, y_test)
-            print("Epoch: {} Iteration: {} Train-loss {:.4f}  Val-loss: {:.4f}".format(str(epoch), str(iteration), loss, loss_test))
 
-    torch.save(net,"../model/cost_model_{}_minmax".format(epochs))
+        iteration += 1
+        if iteration % 250 == 0:
+            preds_test = net(X_test)
+            preds_test = preds_test[:, 0].unsqueeze(1)
+            loss_test = criterion(preds_test, y_test)
+            print("Epoch: {} Iteration: {} Train-loss {:.4f}  Val-loss: {:.4f}".format(str(epoch), str(iteration), loss,
+                                                                                       loss_test))
+
+    torch.save(net, "../model/cost_model_{}_minmax".format(epochs))
 # %%
 
 
@@ -128,14 +131,14 @@ for epoch in range(epochs):
 #     return y, ic_acc, (ci_upper >= y), (ci_lower <= y)
 
 # def get_intervals(preds,std_multiplier=2):
-    
+
 #     mean = np.mean(preds)
 #     std = np.std(preds)
-    
+
 #     upper_bound = mean + (std * std_multiplier)
 #     lower_bound = mean - (std * std_multiplier)
 
-    
+
 #     return upper_bound,lower_bound
 # # %%
 
