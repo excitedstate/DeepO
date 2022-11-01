@@ -48,4 +48,4 @@ python cost_evaluation.py
 > > 论文中提到, 根据三种不同的执行策略生成了`hint`, 包括 `scan`(叶子节点), `join`(连接, 在非叶子节点)和`join order`(
 > > 连接顺序)三个方面
 
-1. 相关代码应该是`hint_generation.py`, 数据使用的应该是开源的数据集``
+1. 相关代码应该是`hint_generation.py`, 好像用到了`learnedcardinalities`这个库, 已经下载到`data`目录了
