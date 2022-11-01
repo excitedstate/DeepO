@@ -1,9 +1,3 @@
 .idea
 .vscode
-example/optimized plans/*
-src/__pycache__/get_plan.cpython-37.pyc
-src/__pycache__/get_plan.cpython-38.pyc
-src/cost_estimation.py
-example/pred_result.txt
-src/result_analysis.py
-src/analysis.py
+

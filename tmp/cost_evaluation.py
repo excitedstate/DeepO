@@ -1,22 +1,16 @@
 # %%
 import joblib
-import pandas as pd
 import numpy as np
 import pickle
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
 
 from blitz.modules import BayesianLSTM
 from blitz.utils import variational_estimator
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from joblib import dump, load
 
 
-# %%
 @variational_estimator
 class NN(nn.Module):
     def __init__(self):
