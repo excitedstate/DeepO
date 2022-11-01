@@ -32,8 +32,20 @@ python cost_evaluation.py
 
 ## 2022/10/23 阅读源码
 
-> > 已完成以下文件的研究, 应该是为了获取优化后的查询计划
+> > 已完成以下文件的研究, 应该是为了获取优化后的查询计划, 这三个就是一体的
 
 1. `tmp/get_plan.py`
 2. `tmp/tmp_for_example.py`
 3. `tmp/get_plan_for_limit.py`
+
+## 2022/11/1 获取所有的查询计划
+
+1. `example/SQL/0`保存的是优化之前的, 没有加 `hint`的查询计划
+2. `example/SQL_with_hint/0`保存到是各种不同的优化后的查询计划, 用作测试
+
+### 不同类型的查询计划的生成
+
+> > 论文中提到, 根据三种不同的执行策略生成了`hint`, 包括 `scan`(叶子节点), `join`(连接, 在非叶子节点)和`join order`(
+> > 连接顺序)三个方面
+
+1. 相关代码应该是`hint_generation.py`, 数据使用的应该是开源的数据集``

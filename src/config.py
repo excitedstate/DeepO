@@ -17,9 +17,16 @@ DB_CONFIGS = {
         "host": "127.0.0.1",
         "user": "postgres",
         "db": "postgres"
+    },
+    "db_lab_vm_bing": {
+        "host": "192.168.72.128",
+        "user": "postgres",
+        "db": "imdbload"
     }
 }
 TEST_DB_CONFIG = DB_CONFIGS["test"]
+DB_LAB_VM_CONFIG = DB_CONFIGS["db_lab_vm_bing"]
+
 
 # # STATEMENT TIMEOUT, PG执行的语句超时时间, 单位是ms
 PG_STATEMENT_TIMEOUT = 60000

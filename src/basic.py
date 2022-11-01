@@ -114,7 +114,7 @@ class PostgresDB:
             self._host = _config.get("host", _host)
             self._user = _config.get("user", _user)
             self._passwd = _config.get("passwd", _passwd)
-            self._db_name = _config.get("db", _db_name)
+            self._db = _config.get("db", _db_name)
         if _try_connect:
             self.connect(_load_hint_plan)
 
@@ -131,24 +131,26 @@ class PostgresDB:
             _cur.execute("LOAD 'pg_hint_plan';")
 
     def execute(self, _sql="") -> typing.Tuple[typing.Tuple[typing.Any]]:
-        """
-            has not implemented
-        :param _sql:
-        :return:
-        """
-        pass
-
-    def get_query_plan(self, _query_sql: str) -> typing.Tuple[typing.Tuple[typing.Any]]:
         assert self._conn is not None, "database not connect"
         try:
             _cur = self._conn.cursor()
 
-            _cur.execute(_query_sql)
+            _cur.execute(_sql)
             _plan = _cur.fetchall()
 
             return tuple(_plan)
         except Exception as e:
-            BasicLogger.exception("get query plan error, exception ", e.__doc__, ", sql:", _query_sql)
+            BasicLogger.exception("failed to execute sql, exception ", e.__doc__, ", sql:", _sql)
+
+    def get_query_plan(self, _query_sql: str) -> typing.Tuple[typing.Tuple[typing.Any]]:
+        """
+            获取执行计划
+        Args:
+            _query_sql: 应该是一个SQL QUERY
+        Returns: Plan
+        """
+        assert not (_query_sql.startswith("EXPLAIN") or _query_sql.startswith("explain")), "sql starts with 'analyse'"
+        return self.execute("EXPLAIN ANALYSE {}".format(_query_sql))
 
     @staticmethod
     def test_get_query_plan(_sql_with_hints_path=DATA_PATH_SQL_WITH_HINTS_TEST,
