@@ -49,3 +49,9 @@ python cost_evaluation.py
 > > 连接顺序)三个方面
 
 1. 相关代码应该是`hint_generation.py`, 好像用到了`learnedcardinalities`这个库, 已经下载到`data`目录了
+2. 和代价估计是一块的， 应该是论文中所阐述的第二阶段或者在线阶段, 目前主要研究离线阶段,
+   就是查询计划嵌入...相关代码在`tmp/embedding`文件夹内
+
+### SCAN_EMBEDDING.py CR
+
+1. 事实上, 前两个函数明显可以用RE去做啊.

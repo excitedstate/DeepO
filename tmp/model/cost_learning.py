@@ -14,11 +14,13 @@ from joblib import dump, load
 
 # %%
 
+# # 这是plan_to_seq的输出
 with open("../data/job-cardinality-sequence.pkl", "rb") as f:
     sequences = pickle.load(f)
 cost_label = np.load("../data/cost_label.npy").reshape(-1, 1)
 print("Data loaded.")
 # %%
+
 sc = MinMaxScaler()
 cost_label = sc.fit_transform(cost_label)
 dump(sc, '../../model/std_scaler.bin', compress=True)

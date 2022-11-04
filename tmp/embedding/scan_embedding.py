@@ -1,29 +1,17 @@
-import tensorflow as tf
 import numpy as np
-from tensorflow.keras.preprocessing.text import one_hot
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential, Model, load_model, Model
-from tensorflow.keras import optimizers, activations
-from tensorflow.keras.layers import Dense, Flatten, LSTM, Bidirectional, SimpleRNN, Dropout
-from tensorflow.keras.losses import logcosh
-# from tensorflow.metrics import mean_relative_error
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras import optimizers
+from tensorflow.keras.layers import Dense, Flatten, SimpleRNN
+
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.layers import LeakyReLU
-import tensorflow.keras.backend as K
 from sklearn.model_selection import train_test_split
 
-import matplotlib.pyplot as plt
 import os
 import csv
-from tensorflow.keras import regularizers
-from matplotlib.pyplot import MultipleLocator
 
-# config = tf.ConfigProto()
-# config.gpu_options.allow_growth = True
-# session = tf.Session(config=config)
-
-
+# #
 file_name_column_min_max_vals = "../../data/column_min_max_vals.csv"
 # plan_path = "../data/JOB/cardinality/"
 # test_path = "../data/JOB/synthetic/"
@@ -34,6 +22,28 @@ test_path = plan_path
 
 
 def extract_time(line):
+    """
+        当查询计划中出现 Sequence Scan 的时候 使用这个方法, 这个必须是在叶子节点出现的
+        这个用re应该会更好
+        "Seq Scan.*?cost=(.*?)..(.*?) rows=(.*?) width=(.*?)) (actual time=(.*?)..(.*?) rows=(.*?) loops=(.*?)"
+        Seq Scan on title t  (cost=0.00..61281.03 rows=2528303 width=4) (actual time=0.018..681.646 rows=2528312 loops=1)
+        匹配出所有数字[\d]+, 然后对 res[0]和res[3]分割
+    Args:
+        line: Seq Scan那一行
+
+    Returns:
+        start_cost Estimated start-up cost. This is the time expended before the output phase can begin,
+                ...e.g., time to do the sorting in a sort node.
+        end_cost Estimated total cost. This is stated on the assumption that the plan node is run to completion,
+                ...i.e., all available rows are retrieved. In practice a node's parent node might stop short of reading
+                ...all available rows (see the LIMIT example below).
+        rows    Estimated number of rows output by this plan node. Again, the node is assumed to be run to completion.
+        width   Estimated average width of rows output by this plan node (in bytes).
+        a_start_cost 实际的 启动时间
+        a_end_cost  实际的 运行时间
+        a_rows 实际影响的行数
+        loops(没有返回, 对于Seq Loop 一般就是一趟)
+    """
     data = line.replace("->", "").lstrip().split("  ")[-1].split(" ")
     start_cost = data[0].split("..")[0].replace("(cost=", "")
     end_cost = data[0].split("..")[1]
@@ -46,20 +56,17 @@ def extract_time(line):
         a_rows)
 
 
-def normalize_data(val, column_name, column_min_max_vals):
-    min_val = column_min_max_vals[column_name][0]
-    max_val = column_min_max_vals[column_name][1]
-    val = float(val)
-    if (val > max_val):
-        val = max_val
-    elif (val < min_val):
-        val = min_val
-    val = float(val)
-    val_norm = (val - min_val) / (max_val - min_val)
-    return val_norm
-
-
 def is_not_number(s):
+    """
+        输入应该是字符串类型, 判断是否为数字
+        这个方法写的不是很优雅, 可以先用. split, 然后判断分成的个数
+        在判断每个元素是否都是数字即可
+    Args:
+        s:
+
+    Returns:
+
+    """
     try:
         float(s)
         return False
@@ -74,7 +81,54 @@ def is_not_number(s):
     return True
 
 
+def normalize_data(val, column_name, column_min_max_vals):
+    """
+        按照论文中的说法, 这里好像是对每一列做最大最小正则化
+        调用前提：is_not_number()方法返回了False, 也就是说, 这是一个浮点数
+    Args:
+        val: 值
+        column_name: 列名称
+        column_min_max_vals: 列的最大最小值, 数据来自 data/column_min_max_vals.csv
+
+    Returns:
+
+    """
+    min_val = column_min_max_vals[column_name][0]
+    max_val = column_min_max_vals[column_name][1]
+    val = float(val)
+    if (val > max_val):
+        val = max_val
+    elif (val < min_val):
+        val = min_val
+    val = float(val)
+    val_norm = (val - min_val) / (max_val - min_val)
+    return val_norm
+
+
 def get_data_and_label(path):
+    """
+        这一段应该就是 本脚本的核心内容了, 用于获取训练数据
+        1. plans先做了一次排序, 不知道什么意思
+        2. 对每个查询计划, 执行以下步骤
+            2.1 读取查询计划内容, 遍历给出的每一个步骤, 如果不包含 Seq Scan, 则继续执行
+                ... 就是找到叶子节点, 因为 Seq Scan只会出现在叶子节点上,
+                但是否可能是别的节点, 还不知道， Seq Scan形如
+                Seq Scan on movie_info_idx mi_idx  (cost=0.00..25185.44 rows=460242 width=4) (actual time=0.023..286.648 rows=459925 loops=1)
+            2.2 获取 计划 消耗的时间 和 真实消耗的时间, 就是从括号中的字符串中匹配数字并返回
+            2.2 获取table名称, 就是上方说的 movie_info_idx,
+            2.3 sentences中除了表名 还带有数据, 如 cost, rows width等
+
+    Args:
+        path: 是 plan_path 或者 test_plan "./datasets/JOB/cardinality"
+            暂时还不清楚是什么东西, 然后又来了一次排序, 每一个应该都是一个查询计划
+            每个查询计划包含一个查询树, 预估时间和实际查询时间
+            最后两行是执行时间 是不需要的
+
+    Returns:
+        sentences
+        rows 返回涉及到的真实的行数
+        pg 返回查询涉及到的行数
+    """
     plans = sorted(os.listdir(path))
     sentences = []
     rows = []
@@ -84,24 +138,34 @@ def get_data_and_label(path):
         with open(path + '/' + file, 'r') as f:
             plan = f.readlines()
             for i in range(len(plan) - 2):
-                if ("Seq Scan" in plan[i]):
+                # # 处理每一行查询计划, 发现Seq Scan
+                if "Seq Scan" in plan[i]:
+                    # # 获取 计划 消耗的时间 和 真实消耗的时间
                     _start_cost, _end_cost, _rows, _width, _a_start_cost_, _a_end_cost, _a_rows = extract_time(plan[i])
-                    if (len(plan[i].strip().split("  ")) == 2):
+                    # # 获取table
+                    if len(plan[i].strip().split("  ")) == 2:
                         _sentence = " ".join(plan[i].strip().split("  ")[0].split(" ")[:-1]) + " "
                         table = plan[i].strip().split("  ")[0].split(" ")[4]
                     else:
                         _sentence = " ".join(plan[i].strip().split("  ")[1].split(" ")[:-1]) + " "
                         table = plan[i].strip().split("  ")[1].split(" ")[4]
-                    if ("actual" not in plan[i + 1] and "Plan" not in plan[i + 1]):
+                    # # 把 Seq Scan的下一行也带上
+                    if "actual" not in plan[i + 1] and "Plan" not in plan[i + 1]:
                         _sentence += plan[i + 1].strip()
                     else:
                         _sentence += table
+                        # # 复制两份, 看不懂
                         _sentence = _sentence + ' ' + _sentence
+                    # # 将sentence中的分隔符去掉 还有 bpchar和 numeric等等修饰, 最后还是把 Seq Scan on 去掉了
+                    # # 作者这部分写的真的非常乱, 让人不明所以
                     _sentence = _sentence.replace(": ", " ").replace("(", "").replace(")", "").replace("'", "").replace(
                         "::bpchar", "") \
                         .replace("[]", "").replace(",", " ").replace("\\", "").replace("::numeric", "").replace("  ",
                                                                                                                 " ") \
                         .replace("Seq Scan on ", "").strip()
+                    # # 对 _sentences 中的每个词都进行处理
+                    # # 如果是数字, 进行正则化, 如果不是, 那就直接添加
+                    # # 可以改写成 map
                     sentence = []
                     ll = _sentence.split(" ")
                     for cnt in range(len(ll)):
@@ -144,23 +208,35 @@ def prepare_data_and_label(sentences, rows):
 
 
 def normalize_labels(labels, min_val=None, max_val=None):
-    # log tranformation withour normalize
+    """
+        log transformation without normalize
+    Args:
+        labels:
+        min_val:
+        max_val:
+
+    Returns:
+
+    """
     labels = np.array([np.log(float(l)) for l in labels]).astype(np.float32)
     return labels, 0, 1
 
 
+# # 从文件中获取列的最大最小值, 用于正则化, 可以改写成迭代器形式的写法
 with open(file_name_column_min_max_vals, 'r') as f:
     data_raw = list(list(rec) for rec in csv.reader(f, delimiter=','))
     column_min_max_vals = {}
     for i, row in enumerate(data_raw[1:]):
         column_min_max_vals[row[0]] = [float(row[1]), float(row[2])]
 
+# # 获取数据
 sentences, rows, pg = get_data_and_label(plan_path)
 
+# # 获取所有的非数字词汇, 这到底是在做什么, 还去了重
 vocabulary = []
 for sentence in sentences:
     for word in sentence:
-        if (word not in vocabulary and is_not_number(word)):
+        if word not in vocabulary and is_not_number(word):
             vocabulary.append(word)
 # print(len(vocabulary))
 vocab_size = len(vocabulary)

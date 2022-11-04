@@ -30,7 +30,7 @@ def test_2():
                """where t.id=mi.movie_id and t.id=mi_idx.movie_id and mi.info_type_id > 16 and """ + \
                """mi_idx.info_type_id = 100;"""
     res = db.execute(test_sql)
-    print(res)
+    print("\n".join(map(lambda x: str(x[0]), res)))
 
 
 if __name__ == '__main__':
