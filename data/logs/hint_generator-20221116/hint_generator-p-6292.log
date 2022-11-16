@@ -1,0 +1,11 @@
+2022-11-16 20:59:15 [P-6292] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.0766307646036148
+2022-11-16 20:59:15 [P-6292] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07878886096297398
+2022-11-16 20:59:15 [P-6292] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07447266824425562
+2022-11-16 20:59:15 [P-6292] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 20:59:15 [P-6292] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:260] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 258, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 366, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'

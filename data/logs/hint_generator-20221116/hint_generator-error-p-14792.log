@@ -1,0 +1,35 @@
+2022-11-16 21:01:32 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'

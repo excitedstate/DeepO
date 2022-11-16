@@ -1,0 +1,5 @@
+2022-11-16 18:24:14 [P-15584] [MainThread] [embedding] [ERROR] embedding.py[line:782] list index out of range, data: ->  Index Only Scan using company_type_pkey on company_type ct  (cost=0.15..0.57 rows=1 width=4) (never executed)
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\embedding.py", line 776, in extract_time
+    a_end_cost = data[4].split("..")[1]
+IndexError: list index out of range

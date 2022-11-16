@@ -1,0 +1,10 @@
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [WARNING] hint_generator.py[line:249] 0 / 2, 1
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [DEBUG] hint_generator.py[line:582] movie_info.info_type_id not in dict
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [WARNING] hint_generator.py[line:259] 0 / 2, 2
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [WARNING] hint_generator.py[line:268] 0 / 2, 3
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [WARNING] hint_generator.py[line:272] 0 / 2, 4
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [INFO] hint_generator.py[line:274] prediction: 0.07682828657329083
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [INFO] hint_generator.py[line:275] prediction upper bound: 0.07915959453430368
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [INFO] hint_generator.py[line:276] prediction lower bound: 0.07449697861227797
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [INFO] hint_generator.py[line:277] ******************************
+2022-11-16 21:19:36 [P-21360] [MainThread] [hint_generator] [WARNING] hint_generator.py[line:249] 1 / 2, 1

@@ -3,7 +3,7 @@
 """
 import os.path
 
-PROJECTS_ROOT = r"C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO"
+PROJECTS_ROOT = r""
 SRC_PATH = os.path.join(PROJECTS_ROOT, "src")
 TEMP_PATH = os.path.join(PROJECTS_ROOT, "tmp")
 # # DATA相关
@@ -23,7 +23,7 @@ DATA_PATH_LC_SQL_TRAIN_CSV = os.path.join(DATA_PATH_LC, "train.csv")
 # # --- MODEL MATH
 MODEL_PATH = os.path.join(PROJECTS_ROOT, "model")
 
-MODEL_PATH_COST_MODEL = os.path.join(MODEL_PATH, "cost_model")
+MODEL_PATH_COST_MODEL_PREFIX = os.path.join(MODEL_PATH, "cost_model_new")
 MODEL_PATH_EMBEDDING_MODEL = os.path.join(MODEL_PATH, "embedding_model.h5")
 
 # # 最大值最小值预处理的结果是需要保存的, 这个过程应该是十分漫长的

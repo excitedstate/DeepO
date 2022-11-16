@@ -1,5 +1,13 @@
 """
     本脚本用于完成查询计划的EMBEDDING
+
+    测试完成
+    输出文件
+
+        data/output.npy
+
+        data/cost_label.npy
+        data/job-cardinality-sequence.pkl
 """
 import csv
 import functools
@@ -19,6 +27,7 @@ from tensorflow.keras import optimizers, layers, utils
 from sklearn.preprocessing import LabelEncoder
 
 from src.basic import GeneralLogger
+from src.config import DATA_PATH
 
 EmbeddingLogger = GeneralLogger(name="embedding", stdout_flag=True, stdout_level=logging.INFO,
                                 file_mode="a")
@@ -77,6 +86,8 @@ class ScanEmbedding:
         max_len = max(map(len, sentences), default=0)
         vocab_size = len(vocab_dict)
 
+        with open(os.path.join(DATA_PATH, "vocab_dict.pkl"), "wb") as _pkl_f:
+            pickle.dump(vocab_dict, _pkl_f)
         # # 3. 获取神经网络模型: 两层 RNN, 三层全连接
         model = self.build_model(max_len, vocab_size)
         # # 4. 获取编码后的数据和标签(log rows), data维度是不一样的 len(query_path)(112) * len(sentences[i](4...20)) * len(vocab_dict)(98)
@@ -465,10 +476,11 @@ class Node(object):
 
 
 class PlanSequential:
-    # # 是否允许对operators进行添加呢?
+    # # 没有涉及到的不处理了
     operators = ['Merge Join', 'Hash', 'Index Only Scan using title_pkey on title t', 'Sort', 'Seq Scan',
                  'Index Scan using title_pkey on title t', 'Materialize', 'Nested Loop', 'Hash Join',
-                 # # new 还有很多
+                 # # new
+                 'Gather'
                  ]
     columns = ['ci.movie_id', 't.id', 'mi_idx.movie_id', 'mi.movie_id', 'mc.movie_id', 'mk.movie_id']
 
@@ -533,6 +545,8 @@ class PlanSequential:
         # #
         if operator.startswith("Seq Scan") or operator.startswith("Parallel Seq Scan"):
             operator = "Seq Scan"
+        if operator == "Parallel Hash":
+            operator = "Hash"
         return operator, operator in self.operators
 
     def extract_attributes(self, operator, line, feature_vec, i=None):
@@ -606,6 +620,7 @@ class PlanSequential:
         feature_len = len(self.operators) + len(self.columns) + 64 + 7
         for each_plan in sorted(os.listdir(dir_query_path)):
             # # 读取查询计划
+            print(each_plan)
             feature_vec = [0.0] * feature_len
             with open(os.path.join(dir_query_path, each_plan), 'r') as f:
                 lines = f.readlines()
@@ -631,7 +646,8 @@ class PlanSequential:
                 # # 最后七个特征直接写入
                 feature_vec[- 7:] = [start_cost, end_cost, rows, width, a_start_cost, a_end_cost, a_rows]
                 # # todo 前面是one-hot编码
-                feature_vec[self.operators.index(operator)] = 1.0
+                if in_operators:
+                    feature_vec[self.operators.index(operator)] = 1.0
                 # # 看看是否是叶子节点
                 if operator == "Seq Scan" or operator == "Parallel Seq Scan":
                     # # 是叶子节点... 这时, 树中只有一个节点
@@ -641,8 +657,8 @@ class PlanSequential:
 
                     # # ... 将节点添加到plans_trees中, 做下一个查询计划
                     root_tokens = feature_vec
-                    node = Node(root_tokens)
-                    plan_trees.append(node)
+                    current_node = Node(root_tokens)
+                    plan_trees.append(current_node)
                     # # # ...
                     # continue
                 else:
@@ -654,15 +670,15 @@ class PlanSequential:
                         j += 1
                     # # 将该节点添加到tree中
                     root_tokens = feature_vec
-                    node = Node(root_tokens)
-                    plan_trees.append(node)
+                    current_node = Node(root_tokens)
+                    plan_trees.append(current_node)
 
                     spaces = 0  # # 用以标识当前节点深度
                     node_stack = []  # # 结点栈
                     i = j
                     # # not lines[i].startswith("Planning time") 这是查询计划的终点
                     # # i是根节点之后的第一个节点
-                    while not lines[i].startswith("Planning time"):
+                    while not lines[i].startswith("Planning Time"):
                         # # 对于每个节点, 事实上的处理和根节点一致
                         line = lines[i]
                         i += 1
@@ -695,7 +711,8 @@ class PlanSequential:
                                                     a_rows]
 
                                 operator, in_operators = self.extract_operator(line_copy)
-                                feature_vec[self.operators.index(operator)] = 1.0
+                                if in_operators:
+                                    feature_vec[self.operators.index(operator)] = 1.0
                                 if operator == "Seq Scan" or operator == "Parallel Seq Scan":
                                     self.extract_attributes(operator, line_copy, feature_vec, scan_cnt)
                                     scan_cnt += 1
@@ -728,7 +745,8 @@ class PlanSequential:
                                                      a_end_cost,
                                                      a_rows]
                                 operator, in_operators = self.extract_operator(line_copy)
-                                feature_vec[self.operators.index(operator)] = 1.0
+                                if in_operators:
+                                    feature_vec[self.operators.index(operator)] = 1.0
                                 if operator == "Seq Scan" or operator == "Parallel Seq Scan":
                                     self.extract_attributes(
                                         operator, line_copy, feature_vec, scan_cnt)
@@ -760,17 +778,25 @@ class PlanSequential:
         Returns:
 
         """
-        data = line.replace("->", "").lstrip().split("  ")[-1].split(" ")
-        start_cost = data[0].split("..")[0].replace("(cost=", "")
-        end_cost = data[0].split("..")[1]
-        rows = data[1].replace("rows=", "")
-        width = data[2].replace("width=", "").replace(")", "")
-        a_start_cost = data[4].split("..")[0].replace("time=", "")
-        a_end_cost = data[4].split("..")[1]
-        a_rows = data[5].replace("rows=", "")
-        return float(start_cost), float(end_cost), float(rows), float(width), float(a_start_cost), float(
-            a_end_cost), float(
-            a_rows)
+        try:
+            data = line.replace("->", "").lstrip().split("  ")[-1].split(" ")
+            start_cost = data[0].split("..")[0].replace("(cost=", "")
+            end_cost = data[0].split("..")[1]
+            rows = data[1].replace("rows=", "")
+            width = data[2].replace("width=", "").replace(")", "")
+            if "never executed" not in line:
+                a_start_cost = data[4].split("..")[0].replace("time=", "")
+                a_end_cost = data[4].split("..")[1]
+                a_rows = data[5].replace("rows=", "")
+            else:
+                a_start_cost = start_cost
+                a_end_cost = end_cost
+                a_rows = rows
+            return float(start_cost), float(end_cost), float(rows), float(width), float(a_start_cost), float(
+                a_end_cost), float(
+                a_rows)
+        except Exception as e:
+            EmbeddingLogger.exception(f"{e}, data: {line.strip()}")
 
     @staticmethod
     def p2t(node: Node):

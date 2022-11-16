@@ -1,0 +1,107 @@
+2022-11-16 21:01:32 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.0767471233010292
+2022-11-16 21:01:32 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07875323614343527
+2022-11-16 21:01:32 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07474101045862314
+2022-11-16 21:01:32 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:32 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07683203488588333
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07866231605584274
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07500175371592392
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07676450714468956
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07947733881765007
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07405167547172906
+2022-11-16 21:01:33 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07674642480909824
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07826713227157
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07522571734662648
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.0762875072658062
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07954828293811718
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07302673159349522
+2022-11-16 21:01:34 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07657228346914052
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07925615860006036
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07388840833822069
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07635664530098438
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07846241122771412
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07425087937425463
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:35 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07650162354111671
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07906116341446208
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07394208366777134
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [ERROR] hint_generator.py[line:263] 'title.kind_id'
+Traceback (most recent call last):
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 261, in get_data_and_label
+    self.normalize_data(ll[cnt], table + '.' + str(ll[cnt - 2]), column_min_max_vals))
+  File "C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\src\hint_generator.py", line 371, in normalize_data
+    min_val = column_min_max_vals[column_name][0]
+KeyError: 'title.kind_id'
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07649171203374863
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07904253174590968
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07394089232158758
+2022-11-16 21:01:36 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:37 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07635454680770636
+2022-11-16 21:01:37 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07893805166608331
+2022-11-16 21:01:37 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.0737710419493294
+2022-11-16 21:01:37 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07650904841721058
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07862547121771814
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07439262561670303
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07648330211639404
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07908400043940444
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07388260379338363
+2022-11-16 21:01:38 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07668930225074291
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07891758000723993
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.0744610244942459
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07692719660699368
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.0789576488280598
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07489674438592756
+2022-11-16 21:01:39 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07615980952978134
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.08020070061503243
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07211891844453025
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07637174811214209
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07898840350835204
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07375509271593214
+2022-11-16 21:01:40 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07613051578402519
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.0797929863545378
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.07246804521351258
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:67] prediction: 0.07661197703331708
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:68] prediction upper bound: 0.07990916569400086
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:69] prediction lower bound: 0.0733147883726333
+2022-11-16 21:01:41 [P-14792] [MainThread] [hint_generator] [INFO] hint_generator.py[line:70] ******************************

@@ -5,7 +5,7 @@ import logging
 import os.path
 
 from src.basic import PostgresDB, GeneralLogger
-from src.config import (MODEL_PATH_COST_MODEL, MODEL_PATH_STD_SCALER, MODEL_PATH_EMBEDDING_MODEL,
+from src.config import (MODEL_PATH_COST_MODEL_PREFIX, MODEL_PATH_STD_SCALER, MODEL_PATH_EMBEDDING_MODEL,
                         DATA_PATH_LC_SQL_TRAIN_CSV, DATA_PATH_GOT_PLANS, DATA_PATH_LC_COLUMN_MIN_MAX_VALS_CSV,
                         DATA_PATH_PLANS_FOR_TRAIN, DB_LAB_VM_CONFIG, DATA_PATH_SQL_FOR_PLANS, DATA_PATH)
 from torch import nn
@@ -17,41 +17,6 @@ MainLogger = GeneralLogger(name="main", stdout_flag=True, stdout_level=logging.I
                            file_mode="a")
 
 
-@variational_estimator
-class NN(nn.Module):
-    def __init__(self):
-        super(NN, self).__init__()
-        self.lstm_1 = BayesianLSTM(79, 10, prior_sigma_1=1, prior_pi=1, posterior_rho_init=-3.0)
-        self.linear = nn.Linear(10, 1)
-
-    def forward(self, x):
-        x_, _ = self.lstm_1(x)
-
-        # gathering only the latent end-of-sequence for the linear layer
-        x_ = x_[:, -1, :]
-        x_ = self.linear(x_)
-        return x_
-
-
-def hint_generate_and_cost_estimation():
-    from src.hint_generator import CostEstimator, HintGenerator
-
-    # # 先获取所有候选的查询计划, 这个是可以的
-    # hg = HintGenerator(
-    #     _sql_path=DATA_PATH_LC_SQL_TRAIN_CSV
-    # )
-    # hg.flow()
-    ce = CostEstimator(
-        _fp_std_scaler=MODEL_PATH_STD_SCALER,
-        cost_model_path=MODEL_PATH_COST_MODEL
-    )
-    ce.flow(
-        plan_dir=os.path.join(DATA_PATH_GOT_PLANS, "0"),
-        leaf_model_path=MODEL_PATH_EMBEDDING_MODEL,
-        fp_column_statistics=DATA_PATH_LC_COLUMN_MIN_MAX_VALS_CSV
-    )
-
-
 def tree_embedding_encode():
     """
     需要先获取训练数据
@@ -61,16 +26,16 @@ def tree_embedding_encode():
     """
     from src.embedding import ScanEmbedding, PlanSequential
 
-    # scan_embedding = ScanEmbedding(
-    #     _fpath_column_min_max_vals=DATA_PATH_LC_COLUMN_MIN_MAX_VALS_CSV,
-    #     _dir_query_plan=DATA_PATH_PLANS_FOR_TRAIN
-    # )
-    # scan_embedding.flow(
-    #     _model_save_path=MODEL_PATH_EMBEDDING_MODEL,
-    #     _save_path_output=f"data/output.npy",
-    #     _save_path_vectors="data/vectors.csv",
-    #     _save_path_labels="data/labels.csv"
-    # )
+    scan_embedding = ScanEmbedding(
+        _fpath_column_min_max_vals=DATA_PATH_LC_COLUMN_MIN_MAX_VALS_CSV,
+        _dir_query_plan=DATA_PATH_PLANS_FOR_TRAIN
+    )
+    scan_embedding.flow(
+        _model_save_path=MODEL_PATH_EMBEDDING_MODEL,
+        _save_path_output=f"data/scan_embedding_output.npy",
+        _save_path_vectors="data/vectors.csv",
+        _save_path_labels="data/labels.csv"
+    )
 
     plan_sequential_encode = PlanSequential(
         _embedding_res_path=os.path.join(DATA_PATH, "output.npy"),
@@ -79,6 +44,19 @@ def tree_embedding_encode():
     plan_sequential_encode.flow(
         fp_job_cardinality_sequence=os.path.join(DATA_PATH, "job-cardinality-sequence.pkl"),
         fp_cost_labels=os.path.join(DATA_PATH, "cost_label.npy")
+    )
+
+
+def train_cost_estimator():
+    from src.cost_learner import CostEstimationTrainer
+
+    cet = CostEstimationTrainer(
+        _fp_plan_sequences_output=os.path.join(DATA_PATH, "job-cardinality-sequence.pkl"),
+        _fp_cost_labels=os.path.join(DATA_PATH, "cost_label.npy"),
+        _fp_std_scalar_labels=MODEL_PATH_STD_SCALER
+    )
+    cet.flow(
+        _fp_model_save_prefix=MODEL_PATH_COST_MODEL_PREFIX
     )
 
 
@@ -102,7 +80,28 @@ def get_train_data():
                     _out_f.write("\n".join(tuple(zip(*_plan))[0]))
 
 
+def hint_generate_and_cost_estimation():
+    from src.hint_generator import CostEstimator, HintGenerator
+
+    # # 先获取所有候选的查询计划, 这个是可以的
+    # hg = HintGenerator(
+    #     _sql_path=DATA_PATH_LC_SQL_TRAIN_CSV
+    # )
+    # hg.flow()
+    ce = CostEstimator(
+        _fp_std_scaler=MODEL_PATH_STD_SCALER,
+        cost_model_path=MODEL_PATH_COST_MODEL_PREFIX + "-4999"
+    )
+    ce.flow(
+        plan_dir=os.path.join(DATA_PATH_GOT_PLANS, "0"),
+        leaf_model_path=MODEL_PATH_EMBEDDING_MODEL,
+        fp_column_statistics=DATA_PATH_LC_COLUMN_MIN_MAX_VALS_CSV,
+        fp_vocab_dict=os.path.join(DATA_PATH, "vocab_dict.pkl")
+    )
+
+
 if __name__ == '__main__':
-    # hint_generate_and_cost_estimation()
     # get_train_data()
-    tree_embedding_encode()
+    # tree_embedding_encode()
+    # train_cost_estimator()
+    hint_generate_and_cost_estimation()
