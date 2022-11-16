@@ -1,0 +1,19 @@
+Finalize Aggregate  (cost=164888.70..164888.71 rows=1 width=8) (actual time=19.581..22.510 rows=1 loops=1)
+  ->  Gather  (cost=164888.49..164888.70 rows=2 width=8) (actual time=4.417..22.488 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=163888.49..163888.50 rows=1 width=8) (actual time=4.479..4.481 rows=1 loops=3)
+              ->  Hash Join  (cost=52.38..163888.23 rows=103 width=0) (actual time=4.472..4.473 rows=0 loops=3)
+                    Hash Cond: (t.id = mi_idx.movie_id)
+                    ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..118021.86 rows=1308954 width=4) (actual time=4.408..4.409 rows=1 loops=3)
+                          Filter: (kind_id = 7)
+                    ->  Hash  (cost=48.70..48.70 rows=260 width=4) (actual time=0.006..0.007 rows=0 loops=3)
+                          Buckets: 1024  Batches: 1  Memory Usage: 8kB
+                          ->  Index Scan using info_type_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..48.70 rows=260 width=4) (actual time=0.006..0.006 rows=0 loops=3)
+                                Index Cond: (info_type_id > 99)
+Planning Time: 0.163 ms
+JIT:
+  Functions: 47
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 1.280 ms, Inlining 0.000 ms, Optimization 0.599 ms, Emission 12.530 ms, Total 14.409 ms
+Execution Time: 22.998 ms

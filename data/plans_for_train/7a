@@ -1,0 +1,47 @@
+Aggregate  (cost=101408.69..101408.70 rows=1 width=64) (actual time=1970.003..1970.064 rows=1 loops=1)
+  ->  Nested Loop  (cost=1004.86..101408.68 rows=1 width=31) (actual time=199.945..1969.996 rows=32 loops=1)
+        ->  Nested Loop  (cost=1004.43..101406.25 rows=1 width=23) (actual time=98.396..1962.231 rows=5154 loops=1)
+              ->  Nested Loop  (cost=1004.28..101404.95 rows=1 width=27) (actual time=91.446..1913.134 rows=43857 loops=1)
+                    ->  Nested Loop  (cost=1003.85..101366.10 rows=1 width=19) (actual time=90.234..128.930 rows=5531 loops=1)
+                          Join Filter: (n.id = an.person_id)
+                          ->  Nested Loop  (cost=1003.42..101362.73 rows=1 width=31) (actual time=88.255..114.570 rows=2951 loops=1)
+                                ->  Nested Loop  (cost=1002.86..100651.52 rows=1 width=23) (actual time=86.824..90.593 rows=16 loops=1)
+                                      ->  Gather  (cost=1002.42..100643.05 rows=1 width=4) (actual time=86.790..86.979 rows=58 loops=1)
+                                            Workers Planned: 2
+                                            Workers Launched: 2
+                                            ->  Hash Join  (cost=2.43..99642.95 rows=1 width=4) (actual time=70.282..950.190 rows=19 loops=3)
+                                                  Hash Cond: (pi.info_type_id = it.id)
+                                                  ->  Parallel Seq Scan on person_info pi  (cost=0.00..99640.49 rows=13 width=8) (actual time=69.725..949.501 rows=19 loops=3)
+                                                        Filter: (note = 'Volker Boehm'::text)
+                                                        Rows Removed by Filter: 1376716
+                                                  ->  Hash  (cost=2.41..2.41 rows=1 width=4) (actual time=0.126..0.127 rows=1 loops=3)
+                                                        Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                        ->  Seq Scan on info_type it  (cost=0.00..2.41 rows=1 width=4) (actual time=0.041..0.045 rows=1 loops=3)
+                                                              Filter: ((info)::text = 'mini biography'::text)
+                                                              Rows Removed by Filter: 112
+                                      ->  Index Scan using name_pkey on name n  (cost=0.43..8.46 rows=1 width=19) (actual time=0.061..0.061 rows=0 loops=58)
+                                            Index Cond: (id = pi.person_id)
+                                            Filter: (((name_pcode_cf)::text >= 'A'::text) AND ((name_pcode_cf)::text <= 'F'::text) AND (((gender)::text = 'm'::text) OR (((gender)::text = 'f'::text) AND (name ~~ 'B%'::text))))
+                                            Rows Removed by Filter: 1
+                                ->  Index Scan using cast_info_idx_pid on cast_info ci  (cost=0.56..701.62 rows=959 width=8) (actual time=0.804..1.464 rows=184 loops=16)
+                                      Index Cond: (person_id = n.id)
+                          ->  Index Scan using aka_name_idx_person on aka_name an  (cost=0.43..3.35 rows=2 width=4) (actual time=0.003..0.004 rows=2 loops=2951)
+                                Index Cond: (person_id = ci.person_id)
+                                Filter: (name ~~ '%a%'::text)
+                                Rows Removed by Filter: 1
+                    ->  Index Scan using movie_link_idx_lmid on movie_link ml  (cost=0.43..38.42 rows=43 width=8) (actual time=0.057..0.321 rows=8 loops=5531)
+                          Index Cond: (linked_movie_id = ci.movie_id)
+              ->  Index Scan using link_type_pkey on link_type lt  (cost=0.15..0.97 rows=1 width=4) (actual time=0.001..0.001 rows=0 loops=43857)
+                    Index Cond: (id = ml.link_type_id)
+                    Filter: ((link)::text = 'features'::text)
+                    Rows Removed by Filter: 1
+        ->  Index Scan using title_pkey on title t  (cost=0.43..2.43 rows=1 width=20) (actual time=0.001..0.001 rows=0 loops=5154)
+              Index Cond: (id = ci.movie_id)
+              Filter: ((production_year >= 1980) AND (production_year <= 1995))
+              Rows Removed by Filter: 0
+Planning Time: 79.711 ms
+JIT:
+  Functions: 82
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 64.577 ms, Inlining 0.000 ms, Optimization 15.853 ms, Emission 97.317 ms, Total 177.746 ms
+Execution Time: 2033.548 ms

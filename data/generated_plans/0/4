@@ -1,0 +1,19 @@
+Aggregate  (cost=537889.92..537889.93 rows=1 width=8) (actual time=29.844..29.847 rows=1 loops=1)
+  ->  Merge Join  (cost=514324.35..537889.30 rows=248 width=0) (actual time=0.021..0.023 rows=0 loops=1)
+        Merge Cond: (mi_idx.movie_id = t.id)
+        ->  Sort  (cost=30.18..30.83 rows=260 width=4) (actual time=0.021..0.021 rows=0 loops=1)
+              Sort Key: mi_idx.movie_id
+              Sort Method: quicksort  Memory: 25kB
+              ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=260 width=4) (actual time=0.005..0.005 rows=0 loops=1)
+                    Filter: (info_type_id > 99)
+        ->  Materialize  (cost=514294.17..530001.62 rows=3141490 width=4) (never executed)
+              ->  Sort  (cost=514294.17..522147.89 rows=3141490 width=4) (never executed)
+                    Sort Key: t.id
+                    ->  Seq Scan on title t  (cost=0.00..89376.00 rows=3141490 width=4) (never executed)
+                          Filter: (kind_id = 7)
+Planning Time: 0.139 ms
+JIT:
+  Functions: 15
+  Options: Inlining true, Optimization true, Expressions true, Deforming true
+  Timing: Generation 0.405 ms, Inlining 2.856 ms, Optimization 16.897 ms, Emission 10.064 ms, Total 30.222 ms
+Execution Time: 30.300 ms

@@ -1,0 +1,14 @@
+Aggregate  (cost=15539810.04..15539810.05 rows=1 width=8) (actual time=32.572..32.574 rows=1 loops=1)
+  ->  Nested Loop  (cost=0.15..15539809.42 rows=248 width=0) (actual time=0.005..0.006 rows=0 loops=1)
+        Join Filter: (t.id = mi_idx.movie_id)
+        ->  Index Scan using info_type_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..48.70 rows=260 width=4) (actual time=0.005..0.005 rows=0 loops=1)
+              Index Cond: (info_type_id > 99)
+        ->  Materialize  (cost=0.00..117355.45 rows=3141490 width=4) (never executed)
+              ->  Seq Scan on title t  (cost=0.00..89376.00 rows=3141490 width=4) (never executed)
+                    Filter: (kind_id = 7)
+Planning Time: 0.155 ms
+JIT:
+  Functions: 12
+  Options: Inlining true, Optimization true, Expressions true, Deforming true
+  Timing: Generation 0.362 ms, Inlining 2.848 ms, Optimization 19.184 ms, Emission 10.528 ms, Total 32.922 ms
+Execution Time: 32.983 ms

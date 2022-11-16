@@ -1,0 +1,28 @@
+Finalize Aggregate  (cost=223779.87..223779.88 rows=1 width=8) (actual time=256.705..256.777 rows=1 loops=1)
+  ->  Gather  (cost=223779.65..223779.86 rows=2 width=8) (actual time=256.690..256.766 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=222779.65..222779.66 rows=1 width=8) (actual time=241.660..241.662 rows=1 loops=3)
+              ->  Merge Join  (cost=216232.29..222779.39 rows=103 width=0) (actual time=241.656..241.657 rows=0 loops=3)
+                    Merge Cond: (t.id = mi_idx.movie_id)
+                    ->  Sort  (cost=216202.11..219474.50 rows=1308954 width=4) (actual time=241.591..241.592 rows=1 loops=3)
+                          Sort Key: t.id
+                          Sort Method: external merge  Disk: 14592kB
+                          Worker 0:  Sort Method: external merge  Disk: 13560kB
+                          Worker 1:  Sort Method: external merge  Disk: 13584kB
+                          ->  Parallel Seq Scan on title t  (cost=0.00..65313.50 rows=1308954 width=4) (actual time=4.970..102.735 rows=1008147 loops=3)
+                                Filter: (kind_id = 7)
+                                Rows Removed by Filter: 91853
+                    ->  Sort  (cost=30.18..30.83 rows=260 width=4) (actual time=0.024..0.025 rows=0 loops=3)
+                          Sort Key: mi_idx.movie_id
+                          Sort Method: quicksort  Memory: 25kB
+                          Worker 0:  Sort Method: quicksort  Memory: 25kB
+                          Worker 1:  Sort Method: quicksort  Memory: 25kB
+                          ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=260 width=4) (actual time=0.017..0.017 rows=0 loops=3)
+                                Filter: (info_type_id > 99)
+Planning Time: 0.254 ms
+JIT:
+  Functions: 47
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 1.210 ms, Inlining 0.000 ms, Optimization 0.577 ms, Emission 14.377 ms, Total 16.164 ms
+Execution Time: 258.533 ms

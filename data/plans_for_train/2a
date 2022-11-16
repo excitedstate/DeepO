@@ -1,0 +1,23 @@
+Aggregate  (cost=1641.65..1641.66 rows=1 width=32) (actual time=1830.920..1830.922 rows=1 loops=1)
+  ->  Nested Loop  (cost=9.32..1641.64 rows=6 width=16) (actual time=18.700..1829.899 rows=2257 loops=1)
+        Join Filter: (mc.movie_id = t.id)
+        ->  Nested Loop  (cost=8.89..1638.70 rows=6 width=8) (actual time=9.322..1765.481 rows=12456 loops=1)
+              ->  Nested Loop  (cost=8.47..1557.78 rows=181 width=12) (actual time=4.861..1420.056 rows=190592 loops=1)
+                    ->  Nested Loop  (cost=8.04..1537.90 rows=32 width=4) (actual time=4.597..791.284 rows=43721 loops=1)
+                          ->  Index Scan using keyword_idx_keyword on keyword k  (cost=0.42..8.44 rows=1 width=4) (actual time=0.335..0.337 rows=1 loops=1)
+                                Index Cond: (keyword = 'character-name-in-title'::text)
+                          ->  Bitmap Heap Scan on movie_keyword mk  (cost=7.62..1525.35 rows=411 width=8) (actual time=4.257..782.587 rows=43721 loops=1)
+                                Recheck Cond: (keyword_id = k.id)
+                                Heap Blocks: exact=15036
+                                ->  Bitmap Index Scan on movie_keyword_idx_keywordid  (cost=0.00..7.51 rows=411 width=0) (actual time=2.279..2.280 rows=43721 loops=1)
+                                      Index Cond: (keyword_id = k.id)
+                    ->  Index Scan using movie_companies_idx_mid on movie_companies mc  (cost=0.43..0.56 rows=6 width=8) (actual time=0.009..0.014 rows=4 loops=43721)
+                          Index Cond: (movie_id = mk.movie_id)
+              ->  Index Scan using company_name_pkey on company_name cn  (cost=0.42..0.45 rows=1 width=4) (actual time=0.002..0.002 rows=0 loops=190592)
+                    Index Cond: (id = mc.company_id)
+                    Filter: ((country_code)::text = '[de]'::text)
+                    Rows Removed by Filter: 1
+        ->  Index Scan using title_pkey on title t  (cost=0.43..0.48 rows=1 width=20) (actual time=0.005..0.005 rows=0 loops=12456)
+              Index Cond: (id = mk.movie_id)
+Planning Time: 0.672 ms
+Execution Time: 1830.957 ms

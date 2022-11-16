@@ -1,0 +1,46 @@
+Finalize Aggregate  (cost=866461.79..866461.80 rows=1 width=128) (actual time=9281.265..9308.408 rows=1 loops=1)
+  ->  Gather  (cost=866461.56..866461.77 rows=2 width=128) (actual time=9280.988..9308.381 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=865461.56..865461.57 rows=1 width=128) (actual time=9240.820..9240.827 rows=1 loops=3)
+              ->  Nested Loop  (cost=15.27..865449.74 rows=1182 width=63) (actual time=1453.116..9142.809 rows=401289 loops=3)
+                    ->  Nested Loop  (cost=14.84..863821.58 rows=485 width=55) (actual time=1447.991..8746.404 rows=94552 loops=3)
+                          ->  Nested Loop  (cost=14.42..860858.53 rows=1274 width=59) (actual time=1447.071..8312.382 rows=234645 loops=3)
+                                Join Filter: (ci.movie_id = mc.movie_id)
+                                ->  Nested Loop  (cost=13.99..857583.04 rows=471 width=63) (actual time=1446.564..7497.191 rows=133851 loops=3)
+                                      ->  Nested Loop  (cost=13.56..856422.72 rows=471 width=43) (actual time=1445.533..6350.060 rows=164431 loops=3)
+                                            ->  Nested Loop  (cost=13.12..854069.90 rows=943 width=31) (actual time=1444.861..4639.814 rows=177738 loops=3)
+                                                  ->  Hash Join  (cost=12.69..843714.07 rows=4003 width=12) (actual time=1444.325..4232.948 rows=177765 loops=3)
+                                                        Hash Cond: (ci.role_id = rt.id)
+                                                        ->  Parallel Seq Scan on cast_info ci  (cost=0.00..841824.97 rows=710577 width=16) (actual time=277.168..4170.916 rows=531113 loops=3)
+                                                              Filter: (note = ANY ('{(voice),"(voice: Japanese version)","(voice) (uncredited)","(voice: English version)"}'::text[]))
+                                                              Rows Removed by Filter: 20627499
+                                                        ->  Hash  (cost=12.64..12.64 rows=4 width=4) (actual time=0.234..0.236 rows=1 loops=3)
+                                                              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                              ->  Bitmap Heap Scan on role_type rt  (cost=4.18..12.64 rows=4 width=4) (actual time=0.227..0.228 rows=1 loops=3)
+                                                                    Recheck Cond: ((role)::text = 'actress'::text)
+                                                                    Heap Blocks: exact=1
+                                                                    ->  Bitmap Index Scan on role_type_role  (cost=0.00..4.18 rows=4 width=0) (actual time=0.203..0.203 rows=1 loops=3)
+                                                                          Index Cond: ((role)::text = 'actress'::text)
+                                                  ->  Index Scan using name_pkey on name n  (cost=0.43..2.59 rows=1 width=19) (actual time=0.002..0.002 rows=1 loops=533295)
+                                                        Index Cond: (id = ci.person_id)
+                                                        Filter: ((gender)::text = 'f'::text)
+                                                        Rows Removed by Filter: 0
+                                            ->  Index Scan using char_name_pkey on char_name chn  (cost=0.43..2.50 rows=1 width=20) (actual time=0.009..0.009 rows=1 loops=533214)
+                                                  Index Cond: (id = ci.person_role_id)
+                                      ->  Index Scan using title_pkey on title t  (cost=0.43..2.46 rows=1 width=20) (actual time=0.007..0.007 rows=1 loops=493292)
+                                            Index Cond: (id = ci.movie_id)
+                                ->  Index Scan using movie_companies_idx_mid on movie_companies mc  (cost=0.43..6.88 rows=6 width=8) (actual time=0.005..0.006 rows=2 loops=401554)
+                                      Index Cond: (movie_id = t.id)
+                          ->  Index Scan using company_name_pkey on company_name cn  (cost=0.42..2.33 rows=1 width=4) (actual time=0.002..0.002 rows=0 loops=703935)
+                                Index Cond: (id = mc.company_id)
+                                Filter: ((country_code)::text = '[us]'::text)
+                                Rows Removed by Filter: 1
+                    ->  Index Scan using aka_name_idx_person on aka_name an  (cost=0.43..3.34 rows=2 width=20) (actual time=0.003..0.004 rows=4 loops=283655)
+                          Index Cond: (person_id = n.id)
+Planning Time: 10.518 ms
+JIT:
+  Functions: 155
+  Options: Inlining true, Optimization true, Expressions true, Deforming true
+  Timing: Generation 7.407 ms, Inlining 102.862 ms, Optimization 392.573 ms, Emission 335.460 ms, Total 838.301 ms
+Execution Time: 9310.719 ms

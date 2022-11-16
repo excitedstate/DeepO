@@ -1,0 +1,19 @@
+Finalize Aggregate  (cost=112151.39..112151.40 rows=1 width=8) (actual time=20.584..23.490 rows=1 loops=1)
+  ->  Gather  (cost=112151.18..112151.39 rows=2 width=8) (actual time=4.200..23.448 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=111151.18..111151.19 rows=1 width=8) (actual time=4.425..4.426 rows=1 loops=3)
+              ->  Hash Join  (cost=23.00..111150.92 rows=103 width=0) (actual time=4.418..4.420 rows=0 loops=3)
+                    Hash Cond: (t.id = mi_idx.movie_id)
+                    ->  Parallel Seq Scan on title t  (cost=0.00..65313.50 rows=1308954 width=4) (actual time=4.344..4.344 rows=1 loops=3)
+                          Filter: (kind_id = 7)
+                    ->  Hash  (cost=19.75..19.75 rows=260 width=4) (actual time=0.010..0.011 rows=0 loops=3)
+                          Buckets: 1024  Batches: 1  Memory Usage: 8kB
+                          ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=260 width=4) (actual time=0.010..0.010 rows=0 loops=3)
+                                Filter: (info_type_id > 99)
+Planning Time: 0.141 ms
+JIT:
+  Functions: 47
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 1.321 ms, Inlining 0.000 ms, Optimization 0.784 ms, Emission 12.189 ms, Total 14.294 ms
+Execution Time: 24.001 ms

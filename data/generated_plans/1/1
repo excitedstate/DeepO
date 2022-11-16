@@ -1,0 +1,13 @@
+Finalize Aggregate  (cost=224340.04..224340.05 rows=1 width=8) (actual time=231.759..236.106 rows=1 loops=1)
+  ->  Gather  (cost=224339.82..224340.03 rows=2 width=8) (actual time=231.745..236.094 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=223339.82..223339.83 rows=1 width=8) (actual time=221.302..221.302 rows=1 loops=3)
+              ->  Parallel Index Scan using title_idx_year on title t  (cost=0.43..221344.38 rows=798178 width=0) (actual time=0.024..198.498 rows=637746 loops=3)
+                    Index Cond: (production_year > 2004)
+Planning Time: 0.111 ms
+JIT:
+  Functions: 14
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 0.904 ms, Inlining 0.000 ms, Optimization 0.447 ms, Emission 7.354 ms, Total 8.705 ms
+Execution Time: 236.406 ms

@@ -1,0 +1,10 @@
+Finalize Aggregate  (cost=68309.16..68309.17 rows=1 width=8) (actual time=118.833..122.529 rows=1 loops=1)
+  ->  Gather  (cost=68308.95..68309.15 rows=2 width=8) (actual time=118.692..122.523 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=67308.95..67308.96 rows=1 width=8) (actual time=109.649..109.650 rows=1 loops=3)
+              ->  Parallel Seq Scan on title t  (cost=0.00..65313.50 rows=798178 width=0) (actual time=0.016..88.501 rows=637746 loops=3)
+                    Filter: (production_year > 2004)
+                    Rows Removed by Filter: 462254
+Planning Time: 0.137 ms
+Execution Time: 122.546 ms

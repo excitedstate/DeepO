@@ -1,0 +1,9 @@
+Aggregate  (cost=2234.32..2234.33 rows=1 width=8) (actual time=0.006..0.006 rows=1 loops=1)
+  ->  Nested Loop  (cost=0.58..2233.70 rows=248 width=0) (actual time=0.004..0.005 rows=0 loops=1)
+        ->  Index Scan using info_type_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..48.70 rows=260 width=4) (actual time=0.004..0.004 rows=0 loops=1)
+              Index Cond: (info_type_id > 99)
+        ->  Index Scan using title_pkey on title t  (cost=0.43..8.40 rows=1 width=4) (never executed)
+              Index Cond: (id = mi_idx.movie_id)
+              Filter: (kind_id = 7)
+Planning Time: 0.160 ms
+Execution Time: 0.021 ms

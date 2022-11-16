@@ -1,0 +1,14 @@
+Finalize Aggregate  (cost=478416.74..478416.75 rows=1 width=8) (actual time=1695.080..1715.415 rows=1 loops=1)
+  ->  Gather  (cost=478416.53..478416.74 rows=2 width=8) (actual time=1694.898..1715.392 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=477416.53..477416.54 rows=1 width=8) (actual time=1684.324..1684.326 rows=1 loops=3)
+              ->  Parallel Seq Scan on movie_info mi  (cost=0.00..470311.88 rows=2841860 width=0) (actual time=762.495..1618.869 rows=2105008 loops=3)
+                    Filter: (info_type_id < 4)
+                    Rows Removed by Filter: 7819976
+Planning Time: 0.228 ms
+JIT:
+  Functions: 14
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 0.833 ms, Inlining 0.000 ms, Optimization 0.368 ms, Emission 6.582 ms, Total 7.784 ms
+Execution Time: 1715.726 ms

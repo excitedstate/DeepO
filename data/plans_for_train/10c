@@ -1,0 +1,52 @@
+Finalize Aggregate  (cost=1039315.89..1039315.90 rows=1 width=64) (actual time=7161.336..7203.405 rows=1 loops=1)
+  ->  Gather  (cost=1039315.67..1039315.88 rows=2 width=64) (actual time=7155.352..7202.009 rows=3 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        ->  Partial Aggregate  (cost=1038315.67..1038315.68 rows=1 width=64) (actual time=7140.414..7140.734 rows=1 loops=3)
+              ->  Hash Join  (cost=959121.53..1035706.51 rows=521832 width=32) (actual time=7129.078..7140.045 rows=4 loops=3)
+                    Hash Cond: (mc.company_type_id = ct.id)
+                    ->  Parallel Hash Join  (cost=959095.55..1034302.55 rows=521832 width=36) (actual time=6794.129..6805.094 rows=4 loops=3)
+                          Hash Cond: (mc.movie_id = t.id)
+                          ->  Parallel Hash Join  (cost=7227.32..68169.09 rows=786713 width=8) (actual time=93.407..482.316 rows=738720 loops=3)
+                                Hash Cond: (mc.company_id = cn.id)
+                                ->  Parallel Seq Scan on movie_companies mc  (cost=0.00..55518.57 rows=2065957 width=12) (actual time=1.078..206.400 rows=1652765 loops=3)
+                                ->  Parallel Hash  (cost=6509.10..6509.10 rows=57458 width=4) (actual time=91.292..91.293 rows=46313 loops=3)
+                                      Buckets: 262144  Batches: 1  Memory Usage: 7520kB
+                                      ->  Parallel Seq Scan on company_name cn  (cost=0.00..6509.10 rows=57458 width=4) (actual time=1.466..82.971 rows=46313 loops=3)
+                                            Filter: ((country_code)::text = '[us]'::text)
+                                            Rows Removed by Filter: 74397
+                          ->  Parallel Hash  (cost=941575.04..941575.04 rows=506735 width=40) (actual time=6206.278..6206.436 rows=6 loops=3)
+                                Buckets: 65536  Batches: 32  Memory Usage: 544kB
+                                ->  Nested Loop  (cost=84903.74..941575.04 rows=506735 width=40) (actual time=5943.007..6205.400 rows=6 loops=3)
+                                      ->  Parallel Hash Join  (cost=84903.30..883963.01 rows=1013942 width=28) (actual time=5891.657..6140.763 rows=454969 loops=3)
+                                            Hash Cond: (ci.movie_id = t.id)
+                                            ->  Hash Join  (cost=25.98..779185.24 rows=1308361 width=8) (actual time=354.620..5013.920 rows=936355 loops=3)
+                                                  Hash Cond: (ci.role_id = rt.id)
+                                                  ->  Parallel Seq Scan on cast_info ci  (cost=0.00..775704.31 rows=1308361 width=12) (actual time=354.541..4912.101 rows=936355 loops=3)
+                                                        Filter: (note ~~ '%(producer)%'::text)
+                                                        Rows Removed by Filter: 20222257
+                                                  ->  Hash  (cost=17.10..17.10 rows=710 width=4) (actual time=0.054..0.055 rows=12 loops=3)
+                                                        Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                        ->  Seq Scan on role_type rt  (cost=0.00..17.10 rows=710 width=4) (actual time=0.045..0.046 rows=12 loops=3)
+                                            ->  Parallel Hash  (cost=65313.50..65313.50 rows=1065586 width=20) (actual time=733.414..733.415 rows=847455 loops=3)
+                                                  Buckets: 65536  Batches: 64  Memory Usage: 2784kB
+                                                  ->  Parallel Seq Scan on title t  (cost=0.00..65313.50 rows=1065586 width=20) (actual time=0.306..551.579 rows=847455 loops=3)
+                                                        Filter: (production_year > 1990)
+                                                        Rows Removed by Filter: 252545
+                                      ->  Memoize  (cost=0.44..1.46 rows=1 width=20) (actual time=0.000..0.000 rows=0 loops=1364907)
+                                            Cache Key: ci.person_role_id
+                                            Cache Mode: logical
+                                            Hits: 354815  Misses: 6  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                            Worker 0:  Hits: 505656  Misses: 6  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                            Worker 1:  Hits: 504418  Misses: 6  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                            ->  Index Scan using char_name_pkey on char_name chn  (cost=0.43..1.45 rows=1 width=20) (actual time=0.357..0.357 rows=1 loops=18)
+                                                  Index Cond: (id = ci.person_role_id)
+                    ->  Hash  (cost=17.10..17.10 rows=710 width=4) (actual time=334.152..334.153 rows=4 loops=3)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          ->  Seq Scan on company_type ct  (cost=0.00..17.10 rows=710 width=4) (actual time=334.128..334.132 rows=4 loops=3)
+Planning Time: 1.598 ms
+JIT:
+  Functions: 179
+  Options: Inlining true, Optimization true, Expressions true, Deforming true
+  Timing: Generation 4.793 ms, Inlining 217.617 ms, Optimization 447.968 ms, Emission 341.162 ms, Total 1011.540 ms
+Execution Time: 7211.595 ms

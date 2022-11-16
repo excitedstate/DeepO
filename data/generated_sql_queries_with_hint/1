@@ -1,0 +1,2 @@
+/*+ SeqScan(t)  */ explain analyse select count(*) from title t where  t.production_year > 2004;
+/*+ IndexScan(t)  */ explain analyse select count(*) from title t where  t.production_year > 2004;

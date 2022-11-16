@@ -1,0 +1,45 @@
+Aggregate  (cost=64818.04..64818.05 rows=1 width=64) (actual time=2064.763..2070.958 rows=1 loops=1)
+  ->  Nested Loop  (cost=1014.99..64818.03 rows=1 width=31) (actual time=2064.760..2070.954 rows=0 loops=1)
+        ->  Nested Loop  (cost=1014.85..64817.10 rows=1 width=35) (actual time=2064.759..2070.953 rows=0 loops=1)
+              Join Filter: (n.id = an.person_id)
+              ->  Gather  (cost=1014.42..64813.72 rows=1 width=47) (actual time=2064.759..2070.951 rows=0 loops=1)
+                    Workers Planned: 2
+                    Workers Launched: 2
+                    ->  Nested Loop  (cost=14.42..63813.62 rows=1 width=47) (actual time=2048.281..2048.284 rows=0 loops=3)
+                          Join Filter: (n.id = pi.person_id)
+                          ->  Nested Loop  (cost=13.99..60755.00 rows=94 width=39) (actual time=3.941..2028.050 rows=744 loops=3)
+                                ->  Nested Loop  (cost=13.56..48832.31 rows=4759 width=20) (actual time=3.254..1700.791 rows=29976 loops=3)
+                                      Join Filter: (t.id = ci.movie_id)
+                                      ->  Nested Loop  (cost=13.12..42576.50 rows=138 width=24) (actual time=3.068..990.562 rows=1078 loops=3)
+                                            ->  Hash Join  (cost=12.69..27602.53 rows=6068 width=4) (actual time=0.316..231.449 rows=63037 loops=3)
+                                                  Hash Cond: (ml.link_type_id = lt.id)
+                                                  ->  Parallel Seq Scan on movie_link ml  (cost=0.00..24745.46 rows=1077146 width=8) (actual time=0.009..161.767 rows=861717 loops=3)
+                                                  ->  Hash  (cost=12.64..12.64 rows=4 width=4) (actual time=0.191..0.192 rows=1 loops=3)
+                                                        Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                                        ->  Bitmap Heap Scan on link_type lt  (cost=4.18..12.64 rows=4 width=4) (actual time=0.184..0.185 rows=1 loops=3)
+                                                              Recheck Cond: ((link)::text = 'features'::text)
+                                                              Heap Blocks: exact=1
+                                                              ->  Bitmap Index Scan on link_type_link  (cost=0.00..4.18 rows=4 width=0) (actual time=0.178..0.178 rows=1 loops=3)
+                                                                    Index Cond: ((link)::text = 'features'::text)
+                                            ->  Index Scan using title_pkey on title t  (cost=0.43..2.47 rows=1 width=20) (actual time=0.012..0.012 rows=0 loops=189112)
+                                                  Index Cond: (id = ml.linked_movie_id)
+                                                  Filter: ((production_year >= 1980) AND (production_year <= 1984))
+                                                  Rows Removed by Filter: 0
+                                      ->  Index Scan using cast_info_idx_mid on cast_info ci  (cost=0.44..44.89 rows=35 width=8) (actual time=0.073..0.651 rows=28 loops=3235)
+                                            Index Cond: (movie_id = ml.linked_movie_id)
+                                ->  Index Scan using name_pkey on name n  (cost=0.43..2.51 rows=1 width=19) (actual time=0.010..0.010 rows=0 loops=89927)
+                                      Index Cond: (id = ci.person_id)
+                                      Filter: (((name_pcode_cf)::text ~~ 'D%'::text) AND ((gender)::text = 'm'::text))
+                                      Rows Removed by Filter: 1
+                          ->  Index Scan using person_info_idx_pid on person_info pi  (cost=0.43..32.53 rows=1 width=8) (actual time=0.027..0.027 rows=0 loops=2231)
+                                Index Cond: (person_id = ci.person_id)
+                                Filter: (note = 'Volker Boehm'::text)
+                                Rows Removed by Filter: 39
+              ->  Index Scan using aka_name_idx_person on aka_name an  (cost=0.43..3.35 rows=2 width=4) (never executed)
+                    Index Cond: (person_id = ci.person_id)
+                    Filter: (name ~~ '%a%'::text)
+        ->  Index Scan using info_type_pkey on info_type it  (cost=0.14..0.54 rows=1 width=4) (never executed)
+              Index Cond: (id = pi.info_type_id)
+              Filter: ((info)::text = 'mini biography'::text)
+Planning Time: 3.156 ms
+Execution Time: 2071.015 ms

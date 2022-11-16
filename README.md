@@ -55,3 +55,10 @@ python cost_evaluation.py
 ### SCAN_EMBEDDING.py CR
 
 1. 事实上, 前两个函数明显可以用RE去做啊.
+2. 把scan_embedding.py plan_to_seq.py整理了一下, 这两个文件将查询计划表示为一种树的形式
+
+## 2022/11/16
+
+> > 作者的实现有很多BUG, 也能看出对Python并不熟练
+> 1. `Seq Scan`的嵌入的第一阶段貌似是获取查询计划中叶子节点的关键信息, 但是对模式串匹配的并不好(本人对Embedding了解不多,
+     但感觉这样会导致很多问题), 做字典(`vocab_dict`)的时候 很多不算词汇的都被识别为词汇

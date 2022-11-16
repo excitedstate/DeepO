@@ -9,8 +9,7 @@ import typing
 import rich
 import tqdm
 
-from src.config import PG_STATEMENT_TIMEOUT, DATA_PATH_SQL_WITH_HINTS, TEST_DB_CONFIG, DATA_PATH_LOGS, \
-    DATA_PATH_SQL_WITH_HINTS_TEST
+from src.config import PG_STATEMENT_TIMEOUT, DATA_PATH_PLANS_FOR_TRAIN, TEST_DB_CONFIG, DATA_PATH_LOGS
 import rich.logging
 
 import psycopg2
@@ -136,13 +135,13 @@ class PostgresDB:
             _cur = self._conn.cursor()
 
             _cur.execute(_sql)
-            _plan = _cur.fetchall()
+            _res = _cur.fetchall()
 
-            return tuple(_plan)
+            return tuple(_res)
         except Exception as e:
-            BasicLogger.exception("failed to execute sql, exception ", e.__doc__, ", sql:", _sql)
+            BasicLogger.exception(f"failed to execute sql, exception {e.__doc__}, sql: {_sql}")
 
-    def get_query_plan(self, _query_sql: str) -> typing.Tuple[typing.Tuple[typing.Any]]:
+    def get_query_plan(self, _query_sql: str) -> typing.Tuple[typing.Tuple[str]]:
         """
             获取执行计划
         Args:
@@ -153,7 +152,7 @@ class PostgresDB:
         return self.execute("EXPLAIN ANALYSE {}".format(_query_sql))
 
     @staticmethod
-    def test_get_query_plan(_sql_with_hints_path=DATA_PATH_SQL_WITH_HINTS_TEST,
+    def test_get_query_plan(_sql_with_hints_path=DATA_PATH_PLANS_FOR_TRAIN,
                             _when_canceling: typing.Callable[
                                 [int, str, typing.Iterable, "PostgresDB"], typing.Iterable] = None):
         """

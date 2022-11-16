@@ -1,0 +1,45 @@
+Aggregate  (cost=85439.58..85439.59 rows=1 width=64) (actual time=8745.914..8750.572 rows=1 loops=1)
+  ->  Nested Loop  (cost=5832.13..85439.58 rows=1 width=32) (actual time=736.413..8750.472 rows=198 loops=1)
+        ->  Nested Loop  (cost=5831.70..85437.39 rows=1 width=40) (actual time=283.280..8468.093 rows=38464 loops=1)
+              ->  Gather  (cost=5831.27..85434.57 rows=1 width=20) (actual time=282.811..8245.263 rows=9423 loops=1)
+                    Workers Planned: 2
+                    Workers Launched: 2
+                    ->  Nested Loop  (cost=4831.27..84434.47 rows=1 width=20) (actual time=187.485..8483.669 rows=3141 loops=3)
+                          ->  Nested Loop  (cost=4831.11..84427.38 rows=39 width=24) (actual time=186.409..8478.990 rows=6758 loops=3)
+                                ->  Nested Loop  (cost=4830.67..72304.52 rows=324 width=24) (actual time=152.546..874.878 rows=14250 loops=3)
+                                      ->  Parallel Hash Join  (cost=4830.24..70711.33 rows=324 width=4) (actual time=152.344..614.121 rows=31881 loops=3)
+                                            Hash Cond: (mc.company_id = cn.id)
+                                            ->  Parallel Seq Scan on movie_companies mc  (cost=0.00..65848.35 rows=12472 width=8) (actual time=0.729..445.578 rows=32198 loops=3)
+                                                  Filter: ((note ~~ '%(Japan)%'::text) AND (note !~~ '%(USA)%'::text))
+                                                  Rows Removed by Filter: 1620567
+                                            ->  Parallel Hash  (cost=4781.27..4781.27 rows=3918 width=4) (actual time=150.745..150.746 rows=3398 loops=3)
+                                                  Buckets: 16384  Batches: 1  Memory Usage: 576kB
+                                                  ->  Parallel Bitmap Heap Scan on company_name cn  (cost=109.30..4781.27 rows=3918 width=4) (actual time=1.885..144.375 rows=3398 loops=3)
+                                                        Recheck Cond: ((country_code)::text = '[jp]'::text)
+                                                        Heap Blocks: exact=1609
+                                                        ->  Bitmap Index Scan on company_name_idx_ccode  (cost=0.00..106.94 rows=9403 width=0) (actual time=3.778..3.779 rows=10193 loops=1)
+                                                              Index Cond: ((country_code)::text = '[jp]'::text)
+                                      ->  Index Scan using title_pkey on title t  (cost=0.43..4.92 rows=1 width=20) (actual time=0.008..0.008 rows=0 loops=95643)
+                                            Index Cond: (id = mc.movie_id)
+                                ->  Index Scan using cast_info_idx_mid on cast_info ci  (cost=0.44..37.41 rows=1 width=12) (actual time=0.512..0.533 rows=0 loops=42750)
+                                      Index Cond: (movie_id = t.id)
+                                      Filter: (note = '(voice: English version)'::text)
+                                      Rows Removed by Filter: 23
+                          ->  Memoize  (cost=0.16..0.58 rows=1 width=4) (actual time=0.000..0.000 rows=0 loops=20273)
+                                Cache Key: ci.role_id
+                                Cache Mode: logical
+                                Hits: 6157  Misses: 2  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                Worker 0:  Hits: 5827  Misses: 2  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                Worker 1:  Hits: 8283  Misses: 2  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                ->  Index Scan using role_type_pkey on role_type rt  (cost=0.15..0.57 rows=1 width=4) (actual time=0.083..0.083 rows=0 loops=6)
+                                      Index Cond: (id = ci.role_id)
+                                      Filter: ((role)::text = 'actress'::text)
+                                      Rows Removed by Filter: 0
+              ->  Index Scan using aka_name_idx_person on aka_name an1  (cost=0.43..2.79 rows=2 width=20) (actual time=0.018..0.022 rows=4 loops=9423)
+                    Index Cond: (person_id = ci.person_id)
+        ->  Index Scan using name_pkey on name n1  (cost=0.43..2.19 rows=1 width=4) (actual time=0.007..0.007 rows=0 loops=38464)
+              Index Cond: (id = an1.person_id)
+              Filter: ((name ~~ '%Yo%'::text) AND (name !~~ '%Yu%'::text))
+              Rows Removed by Filter: 1
+Planning Time: 39.998 ms
+Execution Time: 8751.965 ms

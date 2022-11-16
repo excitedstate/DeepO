@@ -1,0 +1,13 @@
+Aggregate  (cost=149999.63..149999.64 rows=1 width=8) (actual time=2.941..2.942 rows=1 loops=1)
+  ->  Merge Join  (cost=0.58..149999.01 rows=248 width=0) (actual time=0.003..0.003 rows=0 loops=1)
+        Merge Cond: (mi_idx.movie_id = t.id)
+        ->  Index Scan using movie_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..57.80 rows=260 width=4) (actual time=0.002..0.002 rows=0 loops=1)
+              Filter: (info_type_id > 99)
+        ->  Index Scan using title_pkey on title t  (cost=0.43..142084.36 rows=3141490 width=4) (never executed)
+              Filter: (kind_id = 7)
+Planning Time: 0.112 ms
+JIT:
+  Functions: 11
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 0.316 ms, Inlining 0.000 ms, Optimization 0.160 ms, Emission 2.776 ms, Total 3.252 ms
+Execution Time: 3.290 ms

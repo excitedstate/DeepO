@@ -1,0 +1,14 @@
+Aggregate  (cost=128698.05..128698.06 rows=1 width=8) (actual time=3.812..3.813 rows=1 loops=1)
+  ->  Hash Join  (cost=128644.77..128697.43 rows=248 width=0) (actual time=0.022..0.023 rows=0 loops=1)
+        Hash Cond: (mi_idx.movie_id = t.id)
+        ->  Index Scan using info_type_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..48.70 rows=260 width=4) (actual time=0.021..0.021 rows=0 loops=1)
+              Index Cond: (info_type_id > 99)
+        ->  Hash  (cost=89376.00..89376.00 rows=3141490 width=4) (never executed)
+              ->  Seq Scan on title t  (cost=0.00..89376.00 rows=3141490 width=4) (never executed)
+                    Filter: (kind_id = 7)
+Planning Time: 0.147 ms
+JIT:
+  Functions: 15
+  Options: Inlining false, Optimization false, Expressions true, Deforming true
+  Timing: Generation 0.404 ms, Inlining 0.000 ms, Optimization 0.181 ms, Emission 3.606 ms, Total 4.191 ms
+Execution Time: 4.274 ms

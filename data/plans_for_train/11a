@@ -1,0 +1,44 @@
+Aggregate  (cost=1563.11..1563.12 rows=1 width=96) (actual time=865.971..865.975 rows=1 loops=1)
+  ->  Nested Loop  (cost=10.06..1563.10 rows=1 width=117) (actual time=16.608..865.500 rows=568 loops=1)
+        ->  Nested Loop  (cost=9.91..1562.06 rows=6 width=39) (actual time=6.757..863.914 rows=1119 loops=1)
+              ->  Nested Loop  (cost=9.48..1560.34 rows=1 width=47) (actual time=6.527..846.349 rows=129 loops=1)
+                    ->  Nested Loop  (cost=9.06..1559.89 rows=1 width=32) (actual time=5.303..823.430 rows=905 loops=1)
+                          ->  Nested Loop  (cost=8.90..1558.75 rows=26 width=36) (actual time=5.295..822.304 rows=1054 loops=1)
+                                Join Filter: (t.id = mc.movie_id)
+                                ->  Nested Loop  (cost=8.47..1553.35 rows=9 width=24) (actual time=5.161..779.914 rows=606 loops=1)
+                                      ->  Nested Loop  (cost=8.04..1537.90 rows=32 width=4) (actual time=2.935..565.164 rows=11404 loops=1)
+                                            ->  Index Scan using keyword_idx_keyword on keyword k  (cost=0.42..8.44 rows=1 width=4) (actual time=0.869..0.870 rows=1 loops=1)
+                                                  Index Cond: (keyword = 'sequel'::text)
+                                            ->  Bitmap Heap Scan on movie_keyword mk  (cost=7.62..1525.35 rows=411 width=8) (actual time=2.061..555.883 rows=11404 loops=1)
+                                                  Recheck Cond: (keyword_id = k.id)
+                                                  Heap Blocks: exact=6553
+                                                  ->  Bitmap Index Scan on movie_keyword_idx_keywordid  (cost=0.00..7.51 rows=411 width=0) (actual time=1.338..1.338 rows=11404 loops=1)
+                                                        Index Cond: (keyword_id = k.id)
+                                      ->  Index Scan using title_pkey on title t  (cost=0.43..0.48 rows=1 width=20) (actual time=0.017..0.017 rows=0 loops=11404)
+                                            Index Cond: (id = mk.movie_id)
+                                            Filter: ((production_year >= 1950) AND (production_year <= 2000))
+                                            Rows Removed by Filter: 0
+                                ->  Index Scan using movie_companies_idx_mid on movie_companies mc  (cost=0.43..0.56 rows=3 width=12) (actual time=0.067..0.068 rows=2 loops=606)
+                                      Index Cond: (movie_id = mk.movie_id)
+                                      Filter: (note IS NULL)
+                                      Rows Removed by Filter: 4
+                          ->  Memoize  (cost=0.16..0.18 rows=1 width=4) (actual time=0.001..0.001 rows=1 loops=1054)
+                                Cache Key: mc.company_type_id
+                                Cache Mode: logical
+                                Hits: 1052  Misses: 2  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                ->  Index Scan using company_type_pkey on company_type ct  (cost=0.15..0.17 rows=1 width=4) (actual time=0.003..0.003 rows=0 loops=2)
+                                      Index Cond: (id = mc.company_type_id)
+                                      Filter: ((kind)::text = 'production companies'::text)
+                                      Rows Removed by Filter: 0
+                    ->  Index Scan using company_name_pkey on company_name cn  (cost=0.42..0.46 rows=1 width=23) (actual time=0.025..0.025 rows=0 loops=905)
+                          Index Cond: (id = mc.company_id)
+                          Filter: (((country_code)::text <> '[pl]'::text) AND ((name ~~ '%Film%'::text) OR (name ~~ '%Warner%'::text)))
+                          Rows Removed by Filter: 1
+              ->  Index Scan using movie_link_idx_mid on movie_link ml  (cost=0.43..1.28 rows=44 width=8) (actual time=0.125..0.135 rows=9 loops=129)
+                    Index Cond: (movie_id = t.id)
+        ->  Index Scan using link_type_pkey on link_type lt  (cost=0.15..0.17 rows=1 width=86) (actual time=0.001..0.001 rows=1 loops=1119)
+              Index Cond: (id = ml.link_type_id)
+              Filter: ((link)::text ~~ '%follow%'::text)
+              Rows Removed by Filter: 0
+Planning Time: 44.088 ms
+Execution Time: 866.060 ms
