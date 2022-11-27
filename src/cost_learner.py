@@ -203,6 +203,15 @@ class CostEstimationTrainer:
 
     @staticmethod
     def get_intervals(pred_vals, std_multiplier=2):
+        """
+            获取置信区间
+        Args:
+            pred_vals:
+            std_multiplier:
+
+        Returns:
+
+        """
         mean = np.mean(pred_vals)
         std = np.std(pred_vals)
 

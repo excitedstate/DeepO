@@ -38,7 +38,7 @@ class HintGenerator:
             os.makedirs(os.path.join(DATA_PATH_GOT_PLANS, f"{query_idx}"), mode=0o777, exist_ok=True)
 
             # # 获取带hint的查询
-            queries_with_hint, sql = self.generate_hint_queries(query_idx, method="explain analyse")
+            queries_with_hint, sql = self.generate_hint_queries(query_idx, method="explain")
 
             # # 写入SQL
             with open(os.path.join(DATA_PATH_GENE_SQL, f"{query_idx}"), "w") as f:
