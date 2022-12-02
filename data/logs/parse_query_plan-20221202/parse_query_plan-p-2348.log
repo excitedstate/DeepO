@@ -1,0 +1,48 @@
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Aggregate  (cost=54203.87..54203.88 rows=1 width=64) (actual time=595.820..600.276 rows=1 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Aggregate']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_Aggregate
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Nested Loop  (cost=3794.72..54203.86 rows=1 width=32) (actual time=595.816..600.272 rows=0 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Nested Loop']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_NestedLoop
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Nested Loop  (cost=3794.57..54203.12 rows=1 width=36) (actual time=595.816..600.272 rows=0 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Nested Loop']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_NestedLoop
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Nested Loop  (cost=3794.14..54200.93 rows=1 width=44) (actual time=595.816..600.271 rows=0 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Nested Loop']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_NestedLoop
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Nested Loop  (cost=3793.72..54194.01 rows=1 width=48) (actual time=595.815..600.270 rows=0 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Nested Loop']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_NestedLoop
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Nested Loop  (cost=3793.29..54191.20 rows=1 width=28) (actual time=595.815..600.270 rows=0 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Nested Loop']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_NestedLoop
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Gather  (cost=3792.85..54050.62 rows=1 width=28) (actual time=595.815..600.268 rows=0 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Gather']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_Gather
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Nested Loop  (cost=2792.85..53050.52 rows=1 width=28) (actual time=584.634..584.636 rows=0 loops=3)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Nested Loop']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_NestedLoop
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Bitmap Heap Scan on title t  (cost=2792.42..52655.07 rows=15 width=20) (actual time=584.633..584.634 rows=0 loops=3)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Bitmap Heap Scan', 'title t']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_BitMapHeapScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Bitmap Index Scan on title_idx_year  (cost=0.00..2792.41 rows=208398 width=0) (actual time=9.840..9.841 rows=209543 loops=1)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Bitmap Index Scan', 'title_idx_year']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_BitMapIndexScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Index Scan using movie_companies_idx_mid on movie_companies mc  (cost=0.43..26.35 rows=1 width=8) (never executed)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Index Scan', 'movie_companies_idx_mid', 'movie_companies mc']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_IndexScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Index Scan using cast_info_idx_mid on cast_info ci  (cost=0.44..140.57 rows=1 width=12) (never executed)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Index Scan', 'cast_info_idx_mid', 'cast_info ci']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_IndexScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Index Scan using aka_name_idx_person on aka_name an  (cost=0.43..2.79 rows=2 width=20) (never executed)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Index Scan', 'aka_name_idx_person', 'aka_name an']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_IndexScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Index Scan using company_name_pkey on company_name cn  (cost=0.42..6.91 rows=1 width=4) (never executed)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Index Scan', 'company_name_pkey', 'company_name cn']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_IndexScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Index Scan using name_pkey on name n  (cost=0.43..2.19 rows=1 width=4) (never executed)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Index Scan', 'name_pkey', 'name n']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_IndexScan
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:129] Index Scan using role_type_pkey on role_type rt  (cost=0.15..0.57 rows=1 width=4) (never executed)
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:135] ['Index Scan', 'role_type_pkey', 'role_type rt']
+2022-12-02 22:17:17 [P-2348] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:152] _do_IndexScan

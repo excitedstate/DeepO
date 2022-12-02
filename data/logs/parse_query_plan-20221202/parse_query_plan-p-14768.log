@@ -1,0 +1,30 @@
+2022-12-02 20:19:34 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Finalize Aggregate  (cost=24568.93..24568.94 rows=1 width=32) (actual time=254.631..276.384 rows=1 loops=1)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Finalize Aggregate']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_FinalizeAggregate
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Gather  (cost=24568.82..24568.93 rows=1 width=32) (actual time=254.523..276.375 rows=2 loops=1)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Gather']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_Gather
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Partial Aggregate  (cost=23568.82..23568.83 rows=1 width=32) (actual time=175.701..175.703 rows=1 loops=2)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Partial Aggregate']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_PartialAggregate
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=8.49..23568.56 rows=103 width=16) (actual time=28.219..175.664 rows=24 loops=2)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=8.05..22989.83 rows=247 width=24) (actual time=8.696..66.764 rows=172 loops=2)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=7.62..22775.50 rows=446 width=4) (actual time=3.406..58.357 rows=7025 loops=2)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Seq Scan on keyword k  (cost=0.00..3455.90 rows=14 width=4) (actual time=2.225..19.648 rows=20 loops=2)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Seq Scan', 'keyword k']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_SeqScan
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Bitmap Heap Scan on movie_keyword mk  (cost=7.62..1375.86 rows=411 width=8) (actual time=0.533..1.846 rows=343 loops=41)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Bitmap Heap Scan', 'movie_keyword mk']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_BitMapHeapScan
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Bitmap Index Scan on movie_keyword_idx_keywordid  (cost=0.00..7.51 rows=411 width=0) (actual time=0.460..0.460 rows=343 loops=41)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Bitmap Index Scan', 'movie_keyword_idx_keywordid']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_BitMapIndexScan
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Index Scan using title_pkey on title t  (cost=0.43..0.48 rows=1 width=20) (actual time=0.001..0.001 rows=0 loops=14050)
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Index Scan', 'title_pkey', 'title t']
+2022-12-02 20:19:42 [P-14768] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_IndexScan

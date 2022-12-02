@@ -1,0 +1,33 @@
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Aggregate  (cost=50.88..50.89 rows=1 width=68) (actual time=0.136..0.137 rows=1 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Aggregate']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_Aggregate
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=5.19..50.87 rows=1 width=44) (actual time=0.135..0.135 rows=0 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=5.04..50.69 rows=1 width=48) (actual time=0.134..0.135 rows=0 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=4.61..48.10 rows=4 width=28) (actual time=0.134..0.135 rows=0 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=4.18..15.09 rows=4 width=4) (actual time=0.134..0.134 rows=0 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Seq Scan on info_type it  (cost=0.00..2.41 rows=1 width=4) (actual time=0.126..0.126 rows=1 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Seq Scan', 'info_type it']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_SeqScan
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Bitmap Heap Scan on movie_info_idx mi_idx  (cost=4.18..12.64 rows=4 width=8) (actual time=0.004..0.004 rows=0 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Bitmap Heap Scan', 'movie_info_idx mi_idx']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_BitMapHeapScan
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Bitmap Index Scan on info_type_id_movie_info_idx  (cost=0.00..4.18 rows=4 width=0) (actual time=0.002..0.002 rows=0 loops=1)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Bitmap Index Scan', 'info_type_id_movie_info_idx']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_BitMapIndexScan
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Index Scan using title_pkey on title t  (cost=0.43..8.25 rows=1 width=24) (never executed)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Index Scan', 'title_pkey', 'title t']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_IndexScan
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Index Scan using movie_companies_idx_mid on movie_companies mc  (cost=0.43..0.64 rows=1 width=32) (never executed)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Index Scan', 'movie_companies_idx_mid', 'movie_companies mc']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_IndexScan
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Index Scan using company_type_pkey on company_type ct  (cost=0.15..0.17 rows=1 width=4) (never executed)
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Index Scan', 'company_type_pkey', 'company_type ct']
+2022-12-02 20:37:39 [P-15856] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_IndexScan

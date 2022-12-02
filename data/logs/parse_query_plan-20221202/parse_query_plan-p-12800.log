@@ -1,0 +1,36 @@
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Aggregate  (cost=136047.69..136047.70 rows=1 width=96) (actual time=1099.206..1103.074 rows=1 loops=1)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Aggregate']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_Aggregate
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=1002.87..136047.68 rows=1 width=48) (actual time=403.551..1102.847 rows=33 loops=1)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=1002.44..136045.21 rows=1 width=40) (actual time=385.382..1090.337 rows=668 loops=1)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=1002.02..136042.86 rows=1 width=44) (actual time=385.363..1079.447 rows=696 loops=1)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=1001.59..136035.92 rows=1 width=36) (actual time=384.045..1031.768 rows=719 loops=1)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Gather  (cost=1001.15..136033.43 rows=1 width=24) (actual time=383.679..952.859 rows=803 loops=1)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Gather']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_Gather
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=1.15..135033.33 rows=1 width=24) (actual time=353.621..1017.854 rows=268 loops=3)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=0.99..135021.87 rows=41 width=28) (actual time=353.498..1017.526 rows=268 loops=3)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Nested Loop  (cost=0.43..125903.35 rows=13 width=24) (actual time=340.832..857.371 rows=826 loops=3)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Nested Loop']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_NestedLoop
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Seq Scan on name n  (cost=0.00..125138.38 rows=62 width=4) (actual time=339.802..838.734 rows=3511 loops=3)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Seq Scan', 'name n']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_SeqScan
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Index Scan using aka_name_idx_person on aka_name an  (cost=0.43..12.32 rows=2 width=20) (actual time=0.004..0.005 rows=0 loops=10533)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Index Scan', 'aka_name_idx_person', 'aka_name an']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_IndexScan
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:126] Index Scan using cast_info_idx_pid on cast_info ci  (cost=0.56..701.10 rows=26 width=16) (actual time=0.186..0.193 rows=0 loops=2477)
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:132] ['Index Scan', 'cast_info_idx_pid', 'cast_info ci']
+2022-12-02 21:04:57 [P-12800] [MainThread] [parse_query_plan] [DEBUG] parse_query_plan.py[line:149] _do_IndexScan

@@ -175,3 +175,21 @@ class PostgresDB:
     def limit_callback(_idx: int, _query_sql_with_hints: str, _plan: typing.Iterable,
                        _db: "PostgresDB") -> typing.Iterable:
         return _db.get_query_plan(_query_sql_with_hints.replace("explain analyse", "explain"))
+
+
+class SequenceGenerator:
+    def __init__(self, start=1, max_num=-1):
+        self.start = start
+        self.max_num = max_num
+        self.cur = self.start
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.cur == self.max_num:
+            raise StopIteration
+        else:
+            old = self.cur
+            self.cur += 1
+            return old

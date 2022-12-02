@@ -6,7 +6,7 @@ import json
 import os
 
 from src.basic import PostgresDB
-from src.config import DB_LAB_VM_CONFIG
+from src.config import DB_LAB_VM_CONFIG, DATA_PATH_PLANS_FOR_TRAIN
 
 
 def test_1():
@@ -94,6 +94,7 @@ def test_3():
     print(_single_scan_rows_set)
 
 
+
 def test_4():
     """
         把所有Seq Scan拿出来
@@ -138,5 +139,28 @@ def test_4():
     ))))
 
 
+def test_5():
+    from src.parse_query_plan import QueryPlan
+
+    # with open(os.path.join(DATA_PATH_PLANS_FOR_TRAIN, "8b")) as query_plan_file:
+    #     qp = QueryPlan(query_plan_file.read())
+    #     qp.pre_order()
+    #     qp.make_digraph(draw=True)
+
+
+    for file_name in os.listdir(DATA_PATH_PLANS_FOR_TRAIN):
+        with open(os.path.join(DATA_PATH_PLANS_FOR_TRAIN, file_name)) as query_plan_file:
+            qp = QueryPlan(query_plan_file.read())
+            qp.pre_order()
+            qp.make_digraph(draw=True)
+    all_words = list()
+    for item in qp.COND_EXP:
+        print(item[0], ",".join(item[1:]), sep=', ')
+        all_words.extend(item[1:])
+    for item in set(all_words):
+        print(item)
+    print(len(set(all_words)))
+
+
 if __name__ == '__main__':
-    test_4()
+    test_5()
