@@ -84,10 +84,10 @@ def hint_generate_and_cost_estimation():
     from src.hint_generator import CostEstimator, HintGenerator
 
     # # 先获取所有候选的查询计划, 这个是可以的
-    # hg = HintGenerator(
-    #     _sql_path=DATA_PATH_LC_SQL_TRAIN_CSV
-    # )
-    # hg.flow()
+    hg = HintGenerator(
+        _sql_path=DATA_PATH_LC_SQL_TRAIN_CSV
+    )
+    hg.flow()
     ce = CostEstimator(
         _fp_std_scaler=MODEL_PATH_STD_SCALER,
         cost_model_path=MODEL_PATH_COST_MODEL_PREFIX + "-4999"
@@ -102,6 +102,6 @@ def hint_generate_and_cost_estimation():
 
 if __name__ == '__main__':
     # get_train_data()
-    # tree_embedding_encode()
+    tree_embedding_encode()
     # train_cost_estimator()
-    hint_generate_and_cost_estimation()
+    # hint_generate_and_cost_estimation()

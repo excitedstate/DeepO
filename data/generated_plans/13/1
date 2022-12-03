@@ -1,0 +1,6 @@
+Finalize Aggregate  (cost=98535.47..98535.48 rows=1 width=8)
+  ->  Gather  (cost=98535.26..98535.47 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=97535.26..97535.27 rows=1 width=8)
+              ->  Parallel Index Scan using cast_info_idx_rid on cast_info ci  (cost=0.56..93138.23 rows=1758810 width=0)
+                    Index Cond: (role_id = 10)

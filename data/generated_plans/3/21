@@ -1,0 +1,9 @@
+Aggregate  (cost=242301.40..242301.41 rows=1 width=8)
+  ->  Nested Loop  (cost=0.86..242198.92 rows=40992 width=0)
+        ->  Index Scan using movie_companies_idx_cid on movie_companies mc  (cost=0.43..72655.00 rows=40992 width=4)
+              Index Cond: (company_id < 27)
+        ->  Index Scan using title_pkey on title t  (cost=0.43..4.14 rows=1 width=4)
+              Index Cond: (id = mc.movie_id)
+JIT:
+  Functions: 7
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

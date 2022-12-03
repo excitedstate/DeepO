@@ -1,4 +1,5 @@
 import enum
+import functools
 import logging
 import re
 import typing
@@ -7,9 +8,9 @@ import networkx as nx
 import rich
 from matplotlib import pyplot as plt
 
-from src.basic import GeneralLogger, SequenceGenerator
+from src.basic import GeneralLogger, SequenceGenerator, blackhole
 
-ParseQueryPlanLogger = GeneralLogger(name="parse_query_plan", stdout_flag=True, stdout_level=logging.DEBUG,
+ParseQueryPlanLogger = GeneralLogger(name="parse_query_plan", stdout_flag=True, stdout_level=logging.INFO,
                                      file_mode="a")
 
 
@@ -41,7 +42,9 @@ class OperatorType(enum.Enum):
 
 
 class CostInfo:
-    def __init__(self, _content: str, _with_actual=True):
+    ACTUAL_COST_RECORDS = set()
+
+    def __init__(self, _content: str):
         """
             查询计划某步骤的成本信息
         """
@@ -54,6 +57,11 @@ class CostInfo:
         self.actual_rows_involved: int = 0
         self.actual_loops: int = 0
         self.parse_content()
+        self.ACTUAL_COST_RECORDS.add(self.actual_end_cost)
+        # self.MAX_ACTUAL_COST = self.actual_end_cost if self.actual_end_cost > self.MAX_ACTUAL_COST \
+        #     else self.MAX_ACTUAL_COST
+        # self.MIN_ACTUAL_COST = self.actual_end_cost if self.actual_end_cost < self.MIN_ACTUAL_COST \
+        #     else self.MIN_ACTUAL_COST
 
     def parse_content(self):
         """
@@ -67,11 +75,15 @@ class CostInfo:
             self.actual_start_cost, self.actual_end_cost, self.actual_rows_involved, \
             self.actual_loops = map(float, re.match(
             "\(cost=(.*?)\.\.(.*?) rows=(.*?) width=.*?\) \(actual time=(.*?)\.\.(.*?) rows=(.*?) loops=(.*?)\)",
-            self.content).groups() if self.content.count("(") == 2 and '(never executed)' not in self.content else (
+            self.content).groups() if '(never executed)' not in self.content else (
             *re.match("\(cost=(.*?)\.\.(.*?) rows=(.*?) width=.*?\)", self.content).groups(), 0, 0, 0, 0))
 
     def __str__(self):
         return f"estimate cost:{self.estimate_end_cost}, actual cost: {self.actual_end_cost}"
+
+    def to_vector(self):
+        # return self.estimate_start_cost, self.estimate_end_cost, self.estimate_rows_involved, self.actual_start_cost, self.actual_end_cost, self.actual_rows_involved, self.actual_loops
+        return self.actual_end_cost,
 
 
 @enum.unique
@@ -89,6 +101,8 @@ class CondExpType(enum.IntEnum):
 
 
 class Operator:
+    ALL_COLUMNS = set()  # # 预处理, 获取到的所有列
+
     __NO_SENSE_VARI__BUT_ZERO = 0
 
     def __init__(self, _content):
@@ -98,7 +112,7 @@ class Operator:
         self.content: str = _content
         self.op_type: OperatorType = OperatorType.NotImplemented
         # # for scan
-        self.op_on: typing.Optional[list[str, str]] = list()
+        self.op_on: typing.Optional[list[str]] = ['']
         self.index_using: str = ''
         # # ... filters and logic
         # # 不同的逻辑表达式的查询估计是不同的,
@@ -111,7 +125,26 @@ class Operator:
         self.parallel = False
         # # cost信息
         self.cost_info: typing.Optional[CostInfo] = None
+        # # 表别名 和 操作涉及到的列
+        self.table_alias = ''
+        self.columns = list()  # # One-Hot形式编码, 忽略具体的比较原则
+        self.filters_exp, self.index_or_join_cond_exp = list(), list()  # # 自然语言描述编码, 但忽略具体的比较值
         self.parse_content()
+
+    def to_vector(self):
+        """
+            将节点改造成类似自然语言的描述, 然后转换成字符串
+        Returns:
+
+        """
+
+        return list(map(str, filter(bool, ['parallel' if self.parallel else '',
+                                           self.op_type.name, *self.op_on, self.index_using,
+                                           'filter',
+                                           *functools.reduce(lambda x, y: x + y, self.filters_exp, list()),
+                                           'condition',
+                                           *functools.reduce(lambda x, y: x + y, self.index_or_join_cond_exp, list()),
+                                           *self.cost_info.to_vector()])))
 
     def parse_content(self):
         """
@@ -153,12 +186,20 @@ class Operator:
             getattr(self, f"_do_{self.op_type.name}")(_additional_info_lines)
         else:
             ParseQueryPlanLogger.warning(f"no method named _do_{self.op_type.name}")
+        # # 收集统计信息, 用于之后的编码
+        for cond_exp_type, col_name, _, *others in self.filters + self.index_or_join_cond:
+            _real_first_column = f"{self.table_alias}.{col_name}" if '.' not in col_name else col_name
+            self.ALL_COLUMNS.add(_real_first_column)
+            if cond_exp_type == CondExpType.SIMPLE_COMPARE and "'" not in others[0] and '.' in others[0]:
+                self.ALL_COLUMNS.add(others[0])
+        self.table_alias = self.op_on[len(self.op_on) - 1] if len(self.op_on) > 0 else self.op_on[0]
 
     def parse_filter_cond_exp(self, cond_exp):
-        self.parse_cond_exp(cond_exp, self.filters, self.filters_sep)
+        self.filters_exp = self.parse_cond_exp(cond_exp, self.filters, self.filters_sep)
 
     def parse_index_recheck_join_cond_exp(self, cond_exp):
-        self.parse_cond_exp(cond_exp, self.index_or_join_cond, self.index_or_join_cond_sep)
+        self.index_or_join_cond_exp = self.parse_cond_exp(cond_exp, self.index_or_join_cond,
+                                                          self.index_or_join_cond_sep)
 
     @staticmethod
     def remove_prefix(_exp, _prefix):
@@ -189,12 +230,15 @@ class Operator:
             2: ANY/ALL复合表达式
             3: 简单判断表达式
         Args:
+            container:
+            cond_sep:
             cond_exp:
         Returns:
 
         """
         cond_exp = cond_exp[1:-1]  # # 去掉括号
         cond_sep.extend(re.findall("AND NOT|OR NOT|AND|OR", cond_exp))
+        result = list()
         # # 找到全部的逻辑表达式
         if cond_sep:
             _filters: list[str] = list(
@@ -208,10 +252,13 @@ class Operator:
                 if "IS NULL" in _exp:
                     container.append(
                         (CondExpType.IS_NULL, Operator.remove_suffix_and_suffix(_exp, "(", " IS NULL"), "IS NULL"))
+                    result.append([CondExpType.IS_NULL.name, Operator.remove_suffix_and_suffix(_exp, "(", " IS NULL")])
                 elif "IS NOT NULL" in _exp:
                     container.append(
                         (CondExpType.IS_NOT_NULL, Operator.remove_suffix_and_suffix(_exp, "(", " IS NOT NULL"),
                          "IS NOT NULL"))
+                    result.append(
+                        [CondExpType.IS_NOT_NULL.name, Operator.remove_suffix_and_suffix(_exp, "(", " IS NOT NULL")])
             else:
                 _match_res = re.match("(.*?) (.*?) (ANY|ALL|NOT) \(\'{(.*?)}\'::(.*?)\[\]", _exp)
                 if _match_res is not None:
@@ -222,12 +269,18 @@ class Operator:
                     ParseQueryPlanLogger.debug(_match_res)
                     container.append(
                         (CondExpType.ANY_ALL_COMP_EXP, _t_keyword, _t_op, _t_pred, *_words_split, _array_type))
+                    result.append([CondExpType.ANY_ALL_COMP_EXP.name, _t_keyword, _t_op, '*', _array_type])
                 else:
                     # # 匹配到一组条件, 形如: keyword = ANY ('{superhero,marvel-comics,based-on-comic,fight}'::text[])
                     # # 匹配到条件, 拆成词, 直接拆成词 就可以啦, 记住去掉一些text修饰
                     _match_res = re.sub("::text|\(|\)", "", _exp).split(" ")
                     _match_res = [_match_res[0], _match_res[1], " ".join(_match_res[2:])]
                     container.append((CondExpType.SIMPLE_COMPARE, *_match_res))
+                    result.append([CondExpType.SIMPLE_COMPARE.name, _match_res[0], _match_res[1], '*'])
+        # # 将 AND 和 OR 重新插入
+        for i, ele in zip(range(1, len(result) + len(cond_sep), 2), cond_sep):
+            result.insert(i, [ele])
+        return result
 
     def __str__(self):
         return f'{self.op_type} {self.cost_info} parallel: {self.parallel}'
@@ -464,6 +517,9 @@ class QueryPlanNode:
         self.operator: Operator = Operator(_content)
         self.id = _id
 
+    def __bool__(self):
+        return self.operator.cost_info.actual_end_cost > 0
+
     @property
     def is_root(self):
         return self.parent is None
@@ -502,6 +558,14 @@ class QueryPlanNode:
 
         """
         return f'{self.node_type.name}[[{self.operator}]: id: {self.id}]'
+
+    def to_vector(self) -> typing.Tuple[str, typing.Any]:
+        """
+            将节点初步向量化
+        Returns:
+
+        """
+        return self.node_type.name, *self.operator.to_vector()
 
 
 class QueryPlan:
@@ -557,11 +621,10 @@ class QueryPlan:
                 cur_node.add_child(new_node)
                 cur_node = new_node
         try:
-            plan_line, exec_line = gene[-1].split("\n")[-2:]
-            self.planing_time = float(re.match(".*? Time: (.*?) ms", plan_line).groups()[0])
-            self.execution_time = float(re.match(".*? Time: (.*?) ms", exec_line).groups()[0])
+            self.planing_time, self.execution_time = re.findall(".*? Time: (.*?) ms", gene[-1])
         except Exception as e:
             ParseQueryPlanLogger.warning(f"query plan raw error: {e}, no time output")
+            ParseQueryPlanLogger.warning(gene[-1])
 
     @staticmethod
     def operators_generator(_content):
@@ -574,23 +637,30 @@ class QueryPlan:
                 _temp.append(_line)
         yield '\n'.join(_temp)
 
-    def pre_order(self):
+    def post_order(self, _callback: typing.Callable[[QueryPlanNode, typing.Any, ...], typing.NoReturn] = None,
+                   *args, **kwargs):
         _planing_time = 0
 
-        def __pre_order(_cur_node: QueryPlanNode):
-            if _cur_node is not None:
-                print(_cur_node)
+        def __default_callback(_node: QueryPlanNode, *a, **k):
+            blackhole(*a, **k)
+            print(_node, _node.to_vector())
 
+        if _callback is None:
+            _callback = __default_callback
+
+        def __post_order(_cur_node: QueryPlanNode):
+            if _cur_node:
                 # print(_cur_node.operator.filters)
                 # print(_cur_node.operator.filters_sep)
                 # print(_cur_node.operator.index_or_join_cond)
                 # print(_cur_node.operator.index_or_join_cond_sep)
-                self.COND_EXP.extend(_cur_node.operator.filters)
-                self.COND_EXP.extend(_cur_node.operator.index_or_join_cond)
-                __pre_order(_cur_node.left)
-                __pre_order(_cur_node.right)
+                # self.COND_EXP.extend(_cur_node.operator.filters)
+                # self.COND_EXP.extend(_cur_node.operator.index_or_join_cond)
+                __post_order(_cur_node.left)
+                __post_order(_cur_node.right)
+                _callback(_cur_node, *args, **kwargs)
 
-        __pre_order(self.root_node)
+        __post_order(self.root_node)
 
     def make_digraph(self, draw=True):
         g = nx.DiGraph()

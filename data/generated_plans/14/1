@@ -1,0 +1,17 @@
+Finalize Aggregate  (cost=5788133.22..5788133.23 rows=1 width=8)
+  ->  Gather  (cost=5788133.01..5788133.22 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=5787133.01..5787133.02 rows=1 width=8)
+              ->  Merge Join  (cost=5232930.39..5721016.75 rows=26446502 width=0)
+                    Merge Cond: (ci.movie_id = t.id)
+                    ->  Sort  (cost=4693412.33..4759532.99 rows=26448265 width=4)
+                          Sort Key: ci.movie_id
+                          ->  Parallel Seq Scan on cast_info ci  (cost=0.00..709583.65 rows=26448265 width=4)
+                    ->  Materialize  (cost=536872.16..553371.06 rows=3299780 width=4)
+                          ->  Sort  (cost=536872.16..545121.61 rows=3299780 width=4)
+                                Sort Key: t.id
+                                ->  Seq Scan on title t  (cost=0.00..89376.00 rows=3299780 width=4)
+                                      Filter: (kind_id > 1)
+JIT:
+  Functions: 15
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

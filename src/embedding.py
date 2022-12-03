@@ -56,6 +56,7 @@ class ScanEmbedding:
     def build_model(_max_len, _vocab_size):
         model = models.Sequential()
         # # 两层循环神经网络, max_len是一个sentence的最大长度, vocab_size 是句子中词的数量, one-hot编码
+        # #  根本就用不了这么多层, 输出即可
         model.add(layers.SimpleRNN(128, return_sequences=True, activation='relu',
                                    input_shape=(_max_len, _vocab_size + 1)))
         # # Fully-connected RNN where the output is to be fed back to input.
@@ -161,7 +162,7 @@ class ScanEmbedding:
     def get_data_and_label(self, _plans_dir: str):
         """
             这一段应该就是 本脚本的核心内容了, 用于获取训练数据
-            todo 其实就是获取 Seq Scan语句中的核心信息, 如 相关的表、别名以及过滤器
+            todo 其实就是获取 Seq Scan 语句中的核心信息, 如 相关的表、别名以及过滤器
             1. plans先做了一次排序, 不知道什么意思
             2. 对每个查询计划, 执行以下步骤
                 2.1 读取查询计划内容, 遍历给出的每一个步骤, 如果不包含 Seq Scan, 则继续执行
@@ -513,7 +514,7 @@ class PlanSequential:
         with open(fp_job_cardinality_sequence, "wb") as f:
             pickle.dump(all_trees, f)
 
-        # #  生成 cost_label, a_end_cost, a_rows 这两个参数保存一下
+        # #  生成 cost_label, a_end_cost 这参数保存一下, 父节点的Cost
         cost_label = list(map(lambda tree: tree.data[-2], trees))
 
         np.save(fp_cost_labels, np.array(cost_label))
@@ -611,7 +612,7 @@ class PlanSequential:
         """
         scan_cnt = 0  # # Scan的数量
         max_children = 0  # # 节点最大子节点树
-        plan_trees = []  # # 每个查询计划有且只有一个节点
+        plan_trees = []  # # 每个查询计划有且只有一个节点,其实就是根节点
         # # feature_len怎么给出的, 但不重要, 最后反正是 给出 feature_vec 就可以啦
         # # 9是操作个数(self.operators), 6 是列数量(self.columns), 这15个特征是 one-hot编码
         # # 涉及到哪个操作或者哪个列 就把 哪个操作标为1
@@ -819,6 +820,14 @@ class PlanSequential:
 
     @staticmethod
     def plan2seq(node: Node):
+        """
+            其实就是执行了一个后序遍历
+        Args:
+            node:
+
+        Returns:
+
+        """
         sequence = []
         # # data就是 9 + 6 + 64 + 7 维度数组
         tmp = node.data

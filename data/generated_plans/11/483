@@ -1,0 +1,18 @@
+Aggregate  (cost=10097178963.54..10097178963.55 rows=1 width=8)
+  ->  Nested Loop  (cost=10000978126.65..10097140902.81 rows=15224294 width=0)
+        Join Filter: (mi.movie_id = t.id)
+        ->  Hash Join  (cost=978126.21..4564162.96 rows=274473992 width=8)
+              Hash Cond: (mk.movie_id = mi.movie_id)
+              ->  Seq Scan on movie_keyword mk  (cost=0.00..115233.87 rows=7480087 width=4)
+              ->  Hash  (cost=687420.90..687420.90 rows=17719145 width=4)
+                    ->  Seq Scan on movie_info mi  (cost=0.00..687420.90 rows=17719145 width=4)
+                          Filter: (info_type_id < 16)
+        ->  Memoize  (cost=0.44..0.49 rows=1 width=4)
+              Cache Key: mk.movie_id
+              Cache Mode: logical
+              ->  Index Scan using title_pkey on title t  (cost=0.43..0.48 rows=1 width=4)
+                    Index Cond: (id = mk.movie_id)
+                    Filter: (production_year > 2010)
+JIT:
+  Functions: 26
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

@@ -1,0 +1,15 @@
+Aggregate  (cost=1768593.45..1768593.46 rows=1 width=8)
+  ->  Hash Join  (cost=1768559.16..1768591.32 rows=851 width=0)
+        Hash Cond: (mi_idx.movie_id = t.id)
+        ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..17.80 rows=780 width=4)
+        ->  Hash  (cost=1723569.90..1723569.90 rows=3599141 width=8)
+              ->  Hash Join  (cost=1385828.96..1723569.90 rows=3599141 width=8)
+                    Hash Cond: (t.id = mi.movie_id)
+                    ->  Index Scan using title_pkey on title t  (cost=0.43..142084.36 rows=1995820 width=4)
+                          Filter: (production_year > 2003)
+                    ->  Hash  (cost=1311440.78..1311440.78 rows=5951020 width=4)
+                          ->  Index Scan using movie_info_idx_infotypeid on movie_info mi  (cost=0.44..1311440.78 rows=5951020 width=4)
+                                Index Cond: (info_type_id = 16)
+JIT:
+  Functions: 24
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

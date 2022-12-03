@@ -1,2 +1,0 @@
-2022-12-02 19:34:41 [P-14536] [MainThread] [parse_query_plan] [INFO] parse_query_plan.py[line:34] 'Finalize Aggregate' is not a valid OperatorType, Finalize Aggregate
-2022-12-02 19:34:41 [P-14536] [MainThread] [parse_query_plan] [WARNING] parse_query_plan.py[line:129] no method named _do_OperatorType.NotImplemented

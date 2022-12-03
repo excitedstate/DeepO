@@ -1,2 +1,2 @@
-/*+ SeqScan(mi)  */ explain analyse select count(*) from movie_info mi where  mi.info_type_id = 3;
-/*+ IndexScan(mi)  */ explain analyse select count(*) from movie_info mi where  mi.info_type_id = 3;
+/*+ SeqScan(mi)  */ explain select count(*) from movie_info mi where  mi.info_type_id = 3;
+/*+ IndexScan(mi)  */ explain select count(*) from movie_info mi where  mi.info_type_id = 3;

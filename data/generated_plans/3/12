@@ -1,0 +1,12 @@
+Aggregate  (cost=2029303821.98..2029303821.99 rows=1 width=8)
+  ->  Nested Loop  (cost=1000.43..2029303719.50 rows=40992 width=0)
+        Join Filter: (t.id = mc.movie_id)
+        ->  Index Scan using title_pkey on title t  (cost=0.43..133834.36 rows=3300000 width=4)
+        ->  Materialize  (cost=1000.00..65987.62 rows=40992 width=4)
+              ->  Gather  (cost=1000.00..65782.66 rows=40992 width=4)
+                    Workers Planned: 2
+                    ->  Parallel Seq Scan on movie_companies mc  (cost=0.00..60683.46 rows=17080 width=4)
+                          Filter: (company_id < 27)
+JIT:
+  Functions: 10
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

@@ -1,0 +1,15 @@
+Aggregate  (cost=23504526.60..23504526.61 rows=1 width=8)
+  ->  Nested Loop  (cost=0.99..23504525.42 rows=472 width=0)
+        Join Filter: (t.id = mk.movie_id)
+        ->  Seq Scan on movie_keyword mk  (cost=0.00..133934.09 rows=4706062 width=4)
+              Filter: (keyword_id > 3624)
+        ->  Materialize  (cost=0.99..4994.33 rows=331 width=8)
+              ->  Nested Loop  (cost=0.99..4992.68 rows=331 width=8)
+                    ->  Index Scan using cast_info_idx_pid on cast_info ci  (cost=0.56..2220.56 rows=331 width=4)
+                          Index Cond: (person_id = 890821)
+                          Filter: (role_id = 1)
+                    ->  Index Scan using title_pkey on title t  (cost=0.43..8.37 rows=1 width=4)
+                          Index Cond: (id = ci.movie_id)
+JIT:
+  Functions: 17
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

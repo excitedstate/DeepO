@@ -1,0 +1,18 @@
+Finalize Aggregate  (cost=1484848.73..1484848.74 rows=1 width=8)
+  ->  Gather  (cost=1484848.52..1484848.73 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=1483848.52..1483848.53 rows=1 width=8)
+              ->  Merge Join  (cost=513797.21..1467989.88 rows=6343456 width=0)
+                    Merge Cond: (t.id = mi.movie_id)
+                    ->  Merge Join  (cost=493099.41..654190.70 rows=1181400 width=8)
+                          Merge Cond: (mk.movie_id = t.id)
+                          ->  Sort  (cost=492986.21..500777.97 rows=3116703 width=4)
+                                Sort Key: mk.movie_id
+                                ->  Parallel Seq Scan on movie_keyword mk  (cost=0.00..71600.03 rows=3116703 width=4)
+                          ->  Index Scan using title_pkey on title t  (cost=0.43..142084.36 rows=1250880 width=4)
+                                Filter: (production_year > 2010)
+                    ->  Index Scan using movie_info_idx_mid on movie_info mi  (cost=0.44..1917768.58 rows=17719145 width=4)
+                          Filter: (info_type_id < 16)
+JIT:
+  Functions: 21
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

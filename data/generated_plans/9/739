@@ -1,0 +1,18 @@
+Finalize Aggregate  (cost=120048.73..120048.74 rows=1 width=8)
+  ->  Gather  (cost=120048.51..120048.72 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=119048.51..119048.52 rows=1 width=8)
+              ->  Merge Join  (cost=1026.77..119048.50 rows=3 width=0)
+                    Merge Cond: (t.id = mi.movie_id)
+                    ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..114584.36 rows=1375000 width=4)
+                    ->  Sort  (cost=1026.34..1026.47 rows=51 width=8)
+                          Sort Key: mi.movie_id
+                          ->  Nested Loop  (cost=0.44..1024.89 rows=51 width=8)
+                                ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=4 width=4)
+                                      Filter: (info_type_id = 100)
+                                ->  Index Scan using movie_info_idx_mid on movie_info mi  (cost=0.44..251.16 rows=13 width=4)
+                                      Index Cond: (movie_id = mi_idx.movie_id)
+                                      Filter: (info_type_id > 16)
+JIT:
+  Functions: 18
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

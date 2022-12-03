@@ -1,0 +1,16 @@
+Finalize Aggregate  (cost=43803976.05..43803976.06 rows=1 width=8)
+  ->  Gather  (cost=43803975.83..43803976.04 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=43802975.83..43802975.84 rows=1 width=8)
+              ->  Nested Loop  (cost=0.87..43802974.95 rows=355 width=0)
+                    Join Filter: (t.id = mi_idx.movie_id)
+                    ->  Nested Loop  (cost=0.87..2487837.85 rows=1499642 width=8)
+                          ->  Parallel Index Scan using movie_info_idx_infotypeid on movie_info mi  (cost=0.44..1276726.49 rows=2479592 width=4)
+                                Index Cond: (info_type_id = 16)
+                          ->  Index Scan using title_pkey on title t  (cost=0.43..0.49 rows=1 width=4)
+                                Index Cond: (id = mi.movie_id)
+                                Filter: (production_year > 2003)
+                    ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..17.80 rows=780 width=4)
+JIT:
+  Functions: 16
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

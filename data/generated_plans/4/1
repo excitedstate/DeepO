@@ -1,0 +1,6 @@
+Aggregate  (cost=164758.91..164758.92 rows=1 width=8)
+  ->  Index Scan using movie_keyword_idx_keywordid on movie_keyword mk  (cost=0.43..164429.20 rows=131883 width=0)
+        Index Cond: (keyword_id < 55)
+JIT:
+  Functions: 4
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

@@ -1,0 +1,6 @@
+Finalize Aggregate  (cost=68309.16..68309.17 rows=1 width=8)
+  ->  Gather  (cost=68308.95..68309.15 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=67308.95..67308.96 rows=1 width=8)
+              ->  Parallel Seq Scan on title t  (cost=0.00..65313.50 rows=798178 width=0)
+                    Filter: (production_year > 2004)

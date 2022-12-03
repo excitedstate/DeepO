@@ -1,0 +1,10 @@
+Aggregate  (cost=146355.98..146355.99 rows=1 width=8)
+  ->  Merge Join  (cost=0.58..146355.98 rows=2 width=0)
+        Merge Cond: (mi_idx.movie_id = t.id)
+        ->  Index Scan using movie_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..57.80 rows=4 width=4)
+              Filter: (info_type_id = 101)
+        ->  Index Scan using title_pkey on title t  (cost=0.43..142084.36 rows=1685515 width=4)
+              Filter: (production_year < 2010)
+JIT:
+  Functions: 11
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

@@ -1,0 +1,20 @@
+Aggregate  (cost=10099886470.25..10099886470.26 rows=1 width=8)
+  ->  Nested Loop  (cost=10001174058.83..10099848409.51 rows=15224294 width=0)
+        Join Filter: (mi.movie_id = t.id)
+        ->  Merge Join  (cost=1174058.39..7271669.67 rows=274473992 width=8)
+              Merge Cond: (mi.movie_id = mk.movie_id)
+              ->  Index Scan using movie_info_idx_mid on movie_info mi  (cost=0.44..1917768.58 rows=17719145 width=4)
+                    Filter: (info_type_id < 16)
+              ->  Materialize  (cost=1173798.73..1211199.16 rows=7480087 width=4)
+                    ->  Sort  (cost=1173798.73..1192498.94 rows=7480087 width=4)
+                          Sort Key: mk.movie_id
+                          ->  Seq Scan on movie_keyword mk  (cost=0.00..115233.87 rows=7480087 width=4)
+        ->  Memoize  (cost=0.44..0.49 rows=1 width=4)
+              Cache Key: mk.movie_id
+              Cache Mode: logical
+              ->  Index Scan using title_pkey on title t  (cost=0.43..0.48 rows=1 width=4)
+                    Index Cond: (id = mk.movie_id)
+                    Filter: (production_year > 2010)
+JIT:
+  Functions: 25
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

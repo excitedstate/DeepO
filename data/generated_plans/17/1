@@ -1,0 +1,9 @@
+Finalize Aggregate  (cost=1286396.55..1286396.56 rows=1 width=8)
+  ->  Gather  (cost=1286396.34..1286396.55 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=1285396.34..1285396.35 rows=1 width=8)
+              ->  Parallel Index Scan using movie_info_idx_infotypeid on movie_info mi  (cost=0.44..1279043.70 rows=2541056 width=0)
+                    Index Cond: (info_type_id > 16)
+JIT:
+  Functions: 6
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

@@ -1,0 +1,14 @@
+Finalize Aggregate  (cost=933858.57..933858.58 rows=1 width=8)
+  ->  Gather  (cost=933858.35..933858.56 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=932858.35..932858.36 rows=1 width=8)
+              ->  Merge Join  (cost=771742.32..927693.46 rows=2065957 width=0)
+                    Merge Cond: (t.id = mc.movie_id)
+                    ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..114584.36 rows=1375000 width=4)
+                    ->  Materialize  (cost=771422.50..796213.98 rows=4958296 width=4)
+                          ->  Sort  (cost=771422.50..783818.24 rows=4958296 width=4)
+                                Sort Key: mc.movie_id
+                                ->  Seq Scan on movie_companies mc  (cost=0.00..84441.96 rows=4958296 width=4)
+JIT:
+  Functions: 11
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

@@ -1,0 +1,13 @@
+Finalize Aggregate  (cost=130762.04..130762.05 rows=1 width=8)
+  ->  Gather  (cost=130761.83..130762.04 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=129761.83..129761.84 rows=1 width=8)
+              ->  Parallel Hash Join  (cost=60896.96..129719.13 rows=17080 width=0)
+                    Hash Cond: (t.id = mc.movie_id)
+                    ->  Parallel Seq Scan on title t  (cost=0.00..61876.00 rows=1375000 width=4)
+                    ->  Parallel Hash  (cost=60683.46..60683.46 rows=17080 width=4)
+                          ->  Parallel Seq Scan on movie_companies mc  (cost=0.00..60683.46 rows=17080 width=4)
+                                Filter: (company_id < 27)
+JIT:
+  Functions: 15
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

@@ -1,0 +1,10 @@
+Aggregate  (cost=195799.60..195799.61 rows=1 width=8)
+  ->  Hash Join  (cost=122376.43..195697.12 rows=40992 width=0)
+        Hash Cond: (mc.movie_id = t.id)
+        ->  Index Scan using movie_companies_idx_cid on movie_companies mc  (cost=0.43..72655.00 rows=40992 width=4)
+              Index Cond: (company_id < 27)
+        ->  Hash  (cost=81126.00..81126.00 rows=3300000 width=4)
+              ->  Seq Scan on title t  (cost=0.00..81126.00 rows=3300000 width=4)
+JIT:
+  Functions: 13
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

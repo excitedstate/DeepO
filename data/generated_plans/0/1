@@ -1,0 +1,17 @@
+Finalize Aggregate  (cost=223779.87..223779.88 rows=1 width=8)
+  ->  Gather  (cost=223779.65..223779.86 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=222779.65..222779.66 rows=1 width=8)
+              ->  Merge Join  (cost=216232.29..222779.39 rows=103 width=0)
+                    Merge Cond: (t.id = mi_idx.movie_id)
+                    ->  Sort  (cost=216202.11..219474.50 rows=1308954 width=4)
+                          Sort Key: t.id
+                          ->  Parallel Seq Scan on title t  (cost=0.00..65313.50 rows=1308954 width=4)
+                                Filter: (kind_id = 7)
+                    ->  Sort  (cost=30.18..30.83 rows=260 width=4)
+                          Sort Key: mi_idx.movie_id
+                          ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=260 width=4)
+                                Filter: (info_type_id > 99)
+JIT:
+  Functions: 17
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

@@ -1,0 +1,13 @@
+Aggregate  (cost=537916.89..537916.90 rows=1 width=8)
+  ->  Merge Join  (cost=514294.32..537916.27 rows=248 width=0)
+        Merge Cond: (mi_idx.movie_id = t.id)
+        ->  Index Scan using movie_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..57.80 rows=260 width=4)
+              Filter: (info_type_id > 99)
+        ->  Materialize  (cost=514294.17..530001.62 rows=3141490 width=4)
+              ->  Sort  (cost=514294.17..522147.89 rows=3141490 width=4)
+                    Sort Key: t.id
+                    ->  Seq Scan on title t  (cost=0.00..89376.00 rows=3141490 width=4)
+                          Filter: (kind_id = 7)
+JIT:
+  Functions: 13
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

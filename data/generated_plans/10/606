@@ -1,0 +1,16 @@
+Finalize Aggregate  (cost=844316.92..844316.93 rows=1 width=8)
+  ->  Gather  (cost=844316.70..844316.91 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=843316.70..843316.71 rows=1 width=8)
+              ->  Nested Loop  (cost=0.86..843316.21 rows=197 width=0)
+                    ->  Nested Loop  (cost=0.43..842980.72 rows=138 width=8)
+                          ->  Parallel Seq Scan on cast_info ci  (cost=0.00..841824.97 rows=138 width=4)
+                                Filter: ((person_id = 890821) AND (role_id = 1))
+                          ->  Index Scan using title_pkey on title t  (cost=0.43..8.37 rows=1 width=4)
+                                Index Cond: (id = ci.movie_id)
+                    ->  Index Scan using movie_keyword_idx_mid on movie_keyword mk  (cost=0.43..2.03 rows=40 width=4)
+                          Index Cond: (movie_id = t.id)
+                          Filter: (keyword_id > 3624)
+JIT:
+  Functions: 16
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

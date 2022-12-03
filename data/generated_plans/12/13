@@ -1,0 +1,14 @@
+Aggregate  (cost=120797.63..120797.64 rows=1 width=8)
+  ->  Gather  (cost=1020.22..120797.62 rows=2 width=0)
+        Workers Planned: 2
+        ->  Merge Join  (cost=20.22..119797.42 rows=1 width=0)
+              Merge Cond: (t.id = mi_idx.movie_id)
+              ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..118021.86 rows=702298 width=4)
+                    Filter: (production_year < 2010)
+              ->  Sort  (cost=19.79..19.80 rows=4 width=4)
+                    Sort Key: mi_idx.movie_id
+                    ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=4 width=4)
+                          Filter: (info_type_id = 101)
+JIT:
+  Functions: 13
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

@@ -1,0 +1,6 @@
+Finalize Aggregate  (cost=86760.51..86760.52 rows=1 width=8)
+  ->  Gather  (cost=86760.30..86760.51 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=85760.30..85760.31 rows=1 width=8)
+              ->  Parallel Seq Scan on movie_keyword mk  (cost=0.00..79391.79 rows=2547404 width=0)
+                    Filter: (keyword_id < 35049)

@@ -9,6 +9,7 @@ TEMP_PATH = os.path.join(PROJECTS_ROOT, "tmp")
 # # DATA相关
 DATA_PATH = os.path.join(PROJECTS_ROOT, "data")
 DATA_PATH_LOGS = os.path.join(DATA_PATH, "logs")
+DATA_PATH_TXT = os.path.join(DATA_PATH, "txt")
 # # SQL和查询计划
 DATA_PATH_GENE_SQL = os.path.join(DATA_PATH, "generated_sql_queries")
 DATA_PATH_GOT_PLANS = os.path.join(DATA_PATH, "generated_plans")

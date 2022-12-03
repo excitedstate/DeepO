@@ -1,0 +1,11 @@
+Aggregate  (cost=176432.41..176432.42 rows=1 width=8)
+  ->  Hash Join  (cost=176382.56..176431.79 rows=248 width=0)
+        Hash Cond: (mi_idx.movie_id = t.id)
+        ->  Index Scan using info_type_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..48.70 rows=260 width=4)
+              Index Cond: (info_type_id > 99)
+        ->  Hash  (cost=137113.79..137113.79 rows=3141490 width=4)
+              ->  Index Scan using title_idx_kindid on title t  (cost=0.43..137113.79 rows=3141490 width=4)
+                    Index Cond: (kind_id = 7)
+JIT:
+  Functions: 15
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

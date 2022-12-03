@@ -1,0 +1,11 @@
+Finalize Aggregate  (cost=1016933.63..1016933.64 rows=1 width=8)
+  ->  Gather  (cost=1016933.42..1016933.63 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=1015933.42..1015933.43 rows=1 width=8)
+              ->  Nested Loop  (cost=0.86..1010768.53 rows=2065957 width=0)
+                    ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..114584.36 rows=1375000 width=4)
+                    ->  Index Scan using movie_companies_idx_mid on movie_companies mc  (cost=0.43..0.59 rows=6 width=4)
+                          Index Cond: (movie_id = t.id)
+JIT:
+  Functions: 7
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

@@ -1,0 +1,15 @@
+Aggregate  (cost=2236321.31..2236321.32 rows=1 width=8)
+  ->  Nested Loop  (cost=1414673.15..2236321.29 rows=7 width=0)
+        Join Filter: (t.id = mi_idx.movie_id)
+        ->  Hash Join  (cost=1414673.15..1870389.49 rows=6098534 width=8)
+              Hash Cond: (t.id = mi.movie_id)
+              ->  Seq Scan on title t  (cost=0.00..81126.00 rows=3300000 width=4)
+              ->  Hash  (cost=1314618.48..1314618.48 rows=6098534 width=4)
+                    ->  Index Scan using movie_info_idx_infotypeid on movie_info mi  (cost=0.44..1314618.48 rows=6098534 width=4)
+                          Index Cond: (info_type_id > 16)
+        ->  Materialize  (cost=0.00..19.77 rows=4 width=4)
+              ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=4 width=4)
+                    Filter: (info_type_id = 100)
+JIT:
+  Functions: 21
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

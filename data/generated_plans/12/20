@@ -1,0 +1,13 @@
+Aggregate  (cost=121675.96..121675.97 rows=1 width=8)
+  ->  Gather  (cost=1020.70..121675.96 rows=2 width=0)
+        Workers Planned: 2
+        ->  Hash Join  (cost=20.70..120675.76 rows=1 width=0)
+              Hash Cond: (t.id = mi_idx.movie_id)
+              ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..118021.86 rows=702298 width=4)
+                    Filter: (production_year < 2010)
+              ->  Hash  (cost=20.22..20.22 rows=4 width=4)
+                    ->  Index Scan using info_type_id_movie_info_idx on movie_info_idx mi_idx  (cost=0.15..20.22 rows=4 width=4)
+                          Index Cond: (info_type_id = 101)
+JIT:
+  Functions: 15
+  Options: Inlining false, Optimization false, Expressions true, Deforming true

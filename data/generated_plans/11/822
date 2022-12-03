@@ -1,0 +1,13 @@
+Aggregate  (cost=10016583302.56..10016583302.57 rows=1 width=8)
+  ->  Nested Loop  (cost=10000020698.66..10016545241.82 rows=15224294 width=0)
+        ->  Merge Join  (cost=20698.23..959787.92 rows=6716522 width=8)
+              Merge Cond: (mi.movie_id = t.id)
+              ->  Index Scan using movie_info_idx_mid on movie_info mi  (cost=0.44..1917768.58 rows=17719145 width=4)
+                    Filter: (info_type_id < 16)
+              ->  Index Scan using title_pkey on title t  (cost=0.43..142084.36 rows=1250880 width=4)
+                    Filter: (production_year > 2010)
+        ->  Index Scan using movie_keyword_idx_mid on movie_keyword mk  (cost=0.43..1.69 rows=63 width=4)
+              Index Cond: (movie_id = t.id)
+JIT:
+  Functions: 16
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

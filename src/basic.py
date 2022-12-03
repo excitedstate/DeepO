@@ -193,3 +193,9 @@ class SequenceGenerator:
             old = self.cur
             self.cur += 1
             return old
+
+
+def blackhole(*args, **kwargs):
+    """
+        make pep8 happy
+    """

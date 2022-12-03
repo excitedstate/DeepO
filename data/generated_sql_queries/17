@@ -1,1 +1,1 @@
-explain analyse select count(*) from movie_info mi where  mi.info_type_id > 16;
+explain select count(*) from movie_info mi where  mi.info_type_id > 16;

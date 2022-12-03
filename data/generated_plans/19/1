@@ -1,0 +1,3 @@
+Aggregate  (cost=1390.47..1390.48 rows=1 width=8)
+  ->  Index Scan using movie_keyword_idx_keywordid on movie_keyword mk  (cost=0.43..1389.61 rows=346 width=0)
+        Index Cond: (keyword_id = 18559)

@@ -1,0 +1,19 @@
+Aggregate  (cost=559201.70..559201.71 rows=1 width=8)
+  ->  Merge Join  (cost=534439.35..559200.52 rows=472 width=0)
+        Merge Cond: (ci.movie_id = t.id)
+        ->  Sort  (cost=5784.69..5786.82 rows=850 width=8)
+              Sort Key: ci.movie_id
+              ->  Nested Loop  (cost=1.00..5743.34 rows=850 width=8)
+                    ->  Index Scan using cast_info_idx_pid on cast_info ci  (cost=0.56..2220.56 rows=331 width=4)
+                          Index Cond: (person_id = 890821)
+                          Filter: (role_id = 1)
+                    ->  Index Scan using movie_keyword_idx_mid on movie_keyword mk  (cost=0.43..10.24 rows=40 width=4)
+                          Index Cond: (movie_id = ci.movie_id)
+                          Filter: (keyword_id > 3624)
+        ->  Materialize  (cost=528654.57..545154.57 rows=3300000 width=4)
+              ->  Sort  (cost=528654.57..536904.57 rows=3300000 width=4)
+                    Sort Key: t.id
+                    ->  Seq Scan on title t  (cost=0.00..81126.00 rows=3300000 width=4)
+JIT:
+  Functions: 20
+  Options: Inlining true, Optimization true, Expressions true, Deforming true
