@@ -1,9 +1,0 @@
-Finalize Aggregate  (cost=263154.00..263154.01 rows=1 width=8)
-  ->  Gather  (cost=263153.78..263153.99 rows=2 width=8)
-        Workers Planned: 2
-        ->  Partial Aggregate  (cost=262153.78..262153.79 rows=1 width=8)
-              ->  Parallel Index Scan using movie_keyword_idx_keywordid on movie_keyword mk  (cost=0.43..255785.27 rows=2547404 width=0)
-                    Index Cond: (keyword_id < 35049)
-JIT:
-  Functions: 6
-  Options: Inlining false, Optimization false, Expressions true, Deforming true

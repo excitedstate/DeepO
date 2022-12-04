@@ -1,221 +1,268 @@
-import joblib
 import torch
-
-import numpy as np
+import typing
 import pickle
-import torch.utils.data
-import torch.nn as nn
-import torch.optim as optim
-
+import os.path
+import logging
+import numpy as np
 from blitz.modules import BayesianLSTM
 from blitz.utils import variational_estimator
-
-from sklearn.preprocessing import MinMaxScaler
+from torch.utils.data import TensorDataset, DataLoader
 from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.preprocessing.sequence import pad_sequences
+
+from src.basic import GeneralLogger
+from src.config import DATA_PATH_MODEL, DATA_PATH_PIC, DATA_PATH_PKL
+from src.query_plan import QueryPlanNode, QueryPlan
+
+from src.embedding import Embedding, EmbeddingNet4Nodes
+
+CostLearnerLogger = GeneralLogger(name="embedding", stdout_flag=True, stdout_level=logging.INFO,
+                                  file_mode="a")
 
 
-# @variational_estimator
-# class CostEstimationNet(nn.Module):
-#     def __init__(self):
-#         super(CostEstimationNet, self).__init__()
-#         self.relu = nn.ReLU()
-#         self.lstm_1 = BayesianLSTM(79, 32, prior_sigma_1=1, prior_pi=1, posterior_rho_init=-3.0)
-#         self.linear_1 = nn.Linear(32, 16)
-#         self.linear_2 = nn.Linear(16, 1)
-#         self.drop_out = nn.Dropout(0.2)
-#
-#     def forward(self, x):
-#         x_, _ = self.lstm_1(x)
-#
-#         # gathering only the latent end-of-sequence for the linear layer
-#         x_ = x_[:, -1, :]
-#         x_ = self.relu(x_)
-#         x_ = self.linear_1(x_)
-#         x_ = self.relu(x_)
-#         x_ = self.drop_out(x_)
-#         x_ = self.linear_2(x_)
-#         return x_
+class CostLearnerDataLoader:
+    def __init__(self, data_x: typing.Union[str, np.ndarray], data_y: typing.Union[str, np.ndarray], *,
+                 test_size=0.1, batch_size=10):
+        self.data_x = np.load(data_x) if isinstance(data_x, str) else data_x
+        self.data_y = np.load(data_y) if isinstance(data_y, str) else data_y
+        assert len(self.data_x), 'data x is not loaded'
+        assert len(self.data_y), 'data y is not loaded'
+        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
+            torch.tensor(self.data_x, dtype=torch.float32),
+            torch.tensor(self.data_y, dtype=torch.float32).unsqueeze(1),
+            test_size=test_size,
+            shuffle=False  # # 不许shuffle, 不许random
+        )
+        self.data_set = TensorDataset(self.x_train, self.y_train)
+        self.dataloader_train = DataLoader(self.data_set, batch_size=batch_size, shuffle=True)
+
+    def __iter__(self):
+        return iter(self.dataloader_train)
+
+
 @variational_estimator
-class CostEstimationNet(nn.Module):
-    def __init__(self):
-        super(CostEstimationNet, self).__init__()
-        self.lstm_1 = BayesianLSTM(79, 10, prior_sigma_1=1, prior_pi=1, posterior_rho_init=-3.0)
-        self.linear = nn.Linear(10, 1)
+class CostLearnerNet(torch.nn.Module):
+    def __init__(self, input_shape):
+        """
+            每条数据包含多个节点, 每个节点的特征维度为 input_shape
+        Args:
+            input_shape:
+        """
+        super(CostLearnerNet, self).__init__()
+        self.lstm = BayesianLSTM(input_shape, 32, prior_sigma_1=1, prior_pi=1, posterior_rho_init=-3.0)
+        self.relu_1 = torch.nn.ReLU()
+        self.linear_1 = torch.nn.Linear(32, 16)
+        self.relu_2 = torch.nn.ReLU()
+        self.drop_out = torch.nn.Dropout(0.2)
+        self.output_layer = torch.nn.Linear(16, 1)
 
-    def forward(self, x):
-        x_, _ = self.lstm_1(x)
+    def forward(self, out):
+        out, _ = self.lstm(out)
 
         # gathering only the latent end-of-sequence for the linear layer
-        x_ = x_[:, -1, :]
-        x_ = self.linear(x_)
-        return x_
+        out = out[:, -1, :]
+        out = self.relu_1(out)
+        out = self.linear_1(out)
+        out = self.relu_2(out)
+        out = self.drop_out(out)
+        out = self.output_layer(out)
+        return out
 
 
-class CostEstimationTrainer:
-    # # Hyper Parameter
-    LEARNING_RATE = 0.001
-    EPOCHS = 5000
-    BATCH_SIZE = 64
+class NetTrainer:
+    def __init__(self, data_x: typing.Union[str, np.ndarray], data_y: typing.Union[str, np.ndarray], *,
+                 test_size=0.1, batch_size=10, input_shape: float = None, epochs=10, lr=0.01):
+        self.data_loader = CostLearnerDataLoader(data_x, data_y, test_size=test_size, batch_size=batch_size)
+        self.net = CostLearnerNet(input_shape if input_shape is not None else self.data_loader.data_x.shape[2]).float()
+        self.criterion = torch.nn.MSELoss()
+        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
+        self.epochs = epochs
 
-    def __init__(self, _fp_plan_sequences_output, _fp_cost_labels, _fp_std_scalar_labels):
+    def train(self):
+        count = 0
+        x_axis_data, y_axis_data = [], []
+        for epoch in range(self.epochs):
+            for i, (datapoints, labels) in enumerate(self.data_loader):
+                self.optimizer.zero_grad()
+
+                loss = self.net.sample_elbo(inputs=datapoints,
+                                            labels=labels,
+                                            criterion=self.criterion,
+                                            sample_nbr=3,
+                                            complexity_cost_weight=1 / self.data_loader.x_train.shape[0])
+                loss.backward()
+                self.optimizer.step()
+
+                count += 1
+                x_axis_data.append(count)
+                y_axis_data.append(loss.detach().numpy())
+                if count % 20 == 0:
+                    output = self.net(self.data_loader.x_test)
+                    output = output[:, 0].unsqueeze(1)
+                    loss_test = self.criterion(output, self.data_loader.y_test)
+                    CostLearnerLogger.info(f"Epoch: {epoch} Iteration: {count} "
+                                           f"Train-loss {loss.detach().numpy():.4f}  Val-loss: {loss_test:.4f}")
+                    self.save_model(os.path.join(DATA_PATH_MODEL, f"cost_model_{epoch}.model"))
+        return x_axis_data, y_axis_data
+
+    def save_model(self, file_path: str):
+        torch.save(self.net, file_path)
+
+    def flow(self, plot=True):
+        x_axis_data, y_axis_data = self.train()
+        if plot:
+            import matplotlib.pyplot as plt
+
+            plt.plot(x_axis_data, y_axis_data)
+            plt.title("loss history")
+            plt.savefig(os.path.join(DATA_PATH_PIC, "loss_history.png"))
+
+
+class CostLearner:
+    """
+        完成训练之后, 现在应当能对给定的查询计划进行代价预测了!
+        对于任意的查询计划, 该类的一个实例可以给出查询代价的预测值
+    """
+
+    def __init__(self, vocab_encoding_dict: typing.Union[str, dict[str, np.ndarray]],
+                 node_embedding_net_load_from: str, cost_learner_net_load_from: str, eval_mode=True):
+        self.vocab_encode_mapping = pickle.load(open(vocab_encoding_dict, "rb"))
+        self.embedding_net = EmbeddingNet4Nodes(load_from=node_embedding_net_load_from)
+        # self.embedding_net.model.summary()
+        self.cost_learner_net = torch.load(cost_learner_net_load_from)
+        if eval_mode:
+            self.cost_learner_net.eval()
+
+    def __call__(self, _query_plan: typing.Union[np.ndarray, QueryPlan, torch.Tensor] = None) -> float:
         """
-
-        Args:
-            _fp_plan_sequences_output:
-            _fp_cost_labels:
+            对于任意的查询计划, 该类的一个实例可以给出查询代价的预测值
         """
-        self.sequences, self.cost_labels = self.load_data(
-            _fp_plan_sequences_output,
-            _fp_cost_labels)
-
-        self.x_train, self.x_test, self.y_train, self.y_test = self.preprocess(_fp_std_scalar_labels)
-        self.fp_std_scalar_labels = _fp_std_scalar_labels
-        self.sc = None
-        self.net = None
-
-    def flow(self, _fp_model_save_prefix):
-        self.preprocess(self.fp_std_scalar_labels)
-        self.train(_fp_model_save_prefix)
-        self.evaluate()
-
-    def train(self, _fp_model_save_prefix):
-        _dataloader = torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(self.x_train, self.y_train),
-            batch_size=self.BATCH_SIZE,
-            shuffle=True)
-        _net = CostEstimationNet().float()
-        self.net = _net
-        _criterion = nn.MSELoss()
-        _optimizer = optim.Adam(_net.parameters(), lr=self.LEARNING_RATE)
-        _iteration = 0
-        for _epoch_no in range(self.EPOCHS):
-            for _batch_no, (_batch_x, _batch_y) in enumerate(_dataloader):
-                _optimizer.zero_grad()
-                _loss = _net.sample_elbo(inputs=_batch_x,
-                                         labels=_batch_y,
-                                         criterion=_criterion,
-                                         sample_nbr=3,
-                                         complexity_cost_weight=1 / self.x_train.shape[0])
-                _loss.backward()
-                _optimizer.step()
-                _iteration += 1
-                if _iteration % 100 == 0:
-                    # # 在测试集上预测并输出
-                    _pred_test = _net(self.x_test)[:, 0].unsqueeze(1)
-                    _loss_test = _criterion(_pred_test, self.y_test)
-                    print(f"Epoch: {_epoch_no} Iteration: {_iteration} "
-                          f"Train-loss {_loss:.4f}  Val-loss: {_loss_test:.4f}")
-            torch.save(_net, f"{_fp_model_save_prefix}-{_epoch_no}")
-
-    def preprocess(self, _fp_std_scalar_labels):
-        # # Transform features by scaling each feature to a given range.
-        # # first parameter default to (0, 1)
-        # # cost labels scale到 0 1 区间
-        sc = MinMaxScaler()
-        self.cost_labels = sc.fit_transform(self.cost_labels)
-        joblib.dump(sc, _fp_std_scalar_labels, compress=True)
-        # #
-        max_length = max(map(lambda sequence: np.shape(sequence)[0], self.sequences), default=0)
-
-        # for sequence in self.sequences:
-        #     if np.shape(sequence)[0] > max_length:
-        #         max_length = np.shape(sequence)[0]
-        # # 扩充sequences, 让输入维度一致
-        padded_sequences = []
-        for seq in self.sequences:
-            if len(seq) < max_length:
-                # # 列表前部添加这么多, 可替换
-                # tmp = [*[([0] * 79) for _ in range(max_length - len(seq))], *seq]
-                tmp = [[0] * 79] * (max_length - len(seq))
-                tmp.extend(seq)
-                padded_sequences.append(tmp)
-            else:
-                # # len(seq) == max_length
-                padded_sequences.append(seq)
-
-        # # 转换成tensor
-        padded_sequences = torch.tensor(np.array(padded_sequences), dtype=torch.float32)
-        cost_label = torch.tensor(self.cost_labels, dtype=torch.float32)
-
-        x_train, x_test, y_train, y_test = train_test_split(padded_sequences,
-                                                            cost_label,
-                                                            test_size=0.25,
-                                                            random_state=42,
-                                                            shuffle=False)
-        self.sc = sc
-        return x_train, x_test, y_train, y_test
-
-    def evaluate(self):
-        idx = 2
-        assert self.sc is not None, "self.sc is None"
-        assert self.net is not None, "self.net is None"
-        pred, pred_vals = self.pred_cost(self.x_test[idx].unsqueeze(0),
-                                         _sc=self.sc, _net=self.net)
-
-        unscaled_y, in_range, y_under_upper, y_above_lower = self.evaluate_pred_vals(pred_vals, self.y_test[idx], 2,
-                                                                                     _sc=self.sc)
-
-        upper, lower = self.get_intervals(pred_vals)
-
-        print("label: ", unscaled_y)
-        print("prediction: ", pred)
-        print("prediction upper bound: ", upper)
-        print("prediction lower bound: ", lower)
-        print("label in prediction range: ", in_range)
-        # %%
-        cnt = 0
-        for idx in range(len(self.x_test)):
-            pred, pred_vals = self.pred_cost(self.x_test[idx].unsqueeze(0),
-                                             _sc=self.sc, _net=self.net)
-            unscaled_y, in_range, y_under_upper, y_above_lower = self.evaluate_pred_vals(pred_vals, self.y_test[idx], 2,
-                                                                                         _sc=self.sc)
-            if in_range:
-                cnt += 1
-        print(cnt / len(self.x_test))
+        embedded_vec = self.embed(_query_plan) if isinstance(_query_plan, QueryPlan) else _query_plan
+        _out = self.cost_learner_net(torch.tensor(embedded_vec, dtype=torch.float32).unsqueeze(0))
+        return _out.detach().numpy()[0][0]
 
     @staticmethod
-    def load_data(_fp_plan_sequences_output, _fp_cost_labels):
-        # # 这是plan_to_seq的输出
-        with open(_fp_plan_sequences_output, "rb") as f:
-            sequences = pickle.load(f)
-        cost_labels = np.load(_fp_cost_labels).reshape(-1, 1)
-        print("Data loaded.")
-        return sequences, cost_labels
+    def get_node_list_of_query_plan(qp: QueryPlan):
+        def __callback(cur_node: QueryPlanNode, _list: list):
+            _list.append(cur_node.to_vector())
+
+        # # 1. 获取查询计划内所有被执行节点的描述
+        node_list = list()
+        qp.post_order(_callback=__callback, _list=node_list)
+        # # 在pycharm外运行 设置draw = False
+        qp.make_digraph(draw=False)
+        return node_list
 
     @staticmethod
-    def pred_cost(x, sample_nbr=100, _sc: MinMaxScaler = None, _net: nn.Module = None):
-        pred_vals = [_net(x).cpu().item() for _ in range(sample_nbr)]
-        pred_mean = np.mean(pred_vals)
-        pred_mean = _sc.inverse_transform(pred_mean.reshape(1, 1))[0][0]
-        pred_vals = _sc.inverse_transform(np.array(pred_vals).reshape(1, -1))
-        return pred_mean, pred_vals
-
-    @staticmethod
-    def evaluate_pred_vals(pred_vals, scaled_y, std_multiplier=2, _sc: MinMaxScaler = None):
-        # print(scaled_y)
-        y = _sc.inverse_transform(scaled_y.reshape(1, 1))[0][0]
-        mean = np.mean(pred_vals)
-        std = np.std(pred_vals)
-        ci_upper = mean + (std_multiplier * std)
-        ci_lower = mean - (std_multiplier * std)
-        ic_acc = (ci_lower <= y) * (ci_upper >= y)
-        return y, ic_acc, (ci_upper >= y), (ci_lower <= y)
-
-    @staticmethod
-    def get_intervals(pred_vals, std_multiplier=2):
+    def predict_cost_and_get_confidence_intervals(query_plan: QueryPlan, n_sample=10, ci_multiplier=6,
+                                                  c: 'CostLearner' = None):
         """
-            获取置信区间
-        Args:
-            pred_vals:
-            std_multiplier:
-
-        Returns:
-
+            mean, std, diff, lower bound, upper bound, in_or_not
         """
-        mean = np.mean(pred_vals)
-        std = np.std(pred_vals)
+        c = c if c is not None else CostLearner.default_factory()
+        embedded_vec, cost = c.embed(query_plan, True)
+        cost_norm = (5346925.973 - float(cost)) / 5346925.973
+        pred_test = np.array(list(map(lambda x: c(embedded_vec), range(n_sample))))
+        pred_test_mean = pred_test.mean()
+        pred_std = pred_test.std(ddof=1)
+        return dict(
+            mean=pred_test_mean,
+            std=pred_std,
+            lower_bound=pred_test_mean - (pred_std * ci_multiplier),
+            upper_bound=pred_test_mean + (pred_std * ci_multiplier),
+            diff=pred_test_mean - cost_norm,
+            ans=(pred_test_mean - (pred_std * ci_multiplier)) <= cost_norm <= (
+                    pred_test_mean + (pred_std * ci_multiplier))
+        )
 
-        upper_bound = mean + (std * std_multiplier)
-        lower_bound = mean - (std * std_multiplier)
+    @staticmethod
+    def predict_cost_and_get_confidence_intervals_eval_mode(query_plan: QueryPlan, n_sample=10,
+                                                            ci_multiplier=6,
+                                                            c: 'CostLearner' = None):
+        """
+            mean, std, lower bound, upper bound, func
+        """
+        c = c if c is not None else CostLearner.default_factory()
+        embedded_vec, _ = c.embed(query_plan, False)
+        pred_test = np.array(list(map(lambda x: c(embedded_vec), range(n_sample))))
+        pred_test_mean = pred_test.mean()
+        pred_std = pred_test.std(ddof=1)
+        return dict(
+            qp=query_plan,
+            mean=pred_test_mean,
+            std=pred_std,
+            lower_bound=pred_test_mean - (pred_std * ci_multiplier),
+            upper_bound=pred_test_mean + (pred_std * ci_multiplier),
+            inverse_function=lambda cost: 5346925.973 - float(cost) * 5346925.973
+        )
 
-        return upper_bound, lower_bound
+    def embed(self, qp: typing.Union[typing.List[typing.List[str]], QueryPlan], need_cost_label: bool = False):
+        node_list = self.get_node_list_of_query_plan(qp) if isinstance(qp, QueryPlan) else qp
+        # # 2. 做查询计划嵌入, 节点中的每一个词
+        plan_seq = Embedding.vectorize_sentences(list(map(lambda x: x[:-1], node_list)),
+                                                 self.vocab_encode_mapping)
+        # # 扩充
+        plan_seq = pad_sequences(plan_seq, padding="post", dtype=np.float32,
+                                 maxlen=self.embedding_net.model.input_shape[1])
+        embedded_vector = self.embedding_net(plan_seq)
+        return embedded_vector, 0 if not need_cost_label else (embedded_vector, node_list[-1][-1])
+
+    @staticmethod
+    def test_single():
+        query_plan_path = r"C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\data\plan\5c"
+        query_plan = Embedding.load_from(_query_plan_path=query_plan_path)
+        c = CostLearner.default_factory()
+        c.predict_cost_and_get_confidence_intervals(query_plan)
+
+    @staticmethod
+    def default_factory():
+        c = CostLearner(os.path.join(DATA_PATH_PKL, "vocab_encode.pkl"),
+                        os.path.join(DATA_PATH_MODEL, "embedding_all_nodes.h5"),
+                        os.path.join(DATA_PATH_MODEL, "cost_model_9.model"))
+        return c
+
+    @staticmethod
+    def test_all():
+        """
+            结果
+            |p|满足条件的比例|
+            |---|---|
+            |6 |0.1504424778761062|
+            |7 |0.19469026548672566|
+            |8 |0.18584070796460178|
+            |9 |0.25663716814159293|
+            |10| 0.26548672566371684|
+            |11| 0.2831858407079646|
+            |12| 0.3805309734513274|
+            |13| 0.4424778761061947|
+            |14| 0.4336283185840708|
+            |15| 0.6017699115044248|
+            |16| 0.672566371681416|
+            |17| 0.6283185840707964|
+            |18| 0.8230088495575221|
+            |19| 0.7522123893805309|
+            |20| 0.8407079646017699|
+            |21| 0.8938053097345132|
+            |22| 0.8407079646017699|
+            |23| 0.8938053097345132|
+            |24| 0.9469026548672567|
+            |25| 0.9203539823008849|
+            |26| 0.9292035398230089|
+            |27| 0.9557522123893806|
+            |28| 0.9469026548672567|
+            |29| 0.9734513274336283|
+        """
+        from src.config import DATA_PATH_PLANS_FOR_TRAIN
+        # # 加载查询计划
+        qp_list = []
+        for query_plan_path in os.listdir(DATA_PATH_PLANS_FOR_TRAIN):
+            full_name = os.path.join(DATA_PATH_PLANS_FOR_TRAIN, query_plan_path)
+            with open(full_name, "r", encoding="utf-8") as f:
+                qp = Embedding.load_from(_query_plan_raw=f.read())
+                qp_list.append(qp)
+
+        c = CostLearner.default_factory()
+        # # 计算ci_multiplier: 29
+        for p in range(6, 30):
+            ans = list(map(lambda qp: c.predict_cost_and_get_confidence_intervals(qp, ci_multiplier=p)['ans'], qp_list))
+            print(p, len(list(filter(bool, ans))) / len(ans))

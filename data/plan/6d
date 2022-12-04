@@ -1,0 +1,29 @@
+Aggregate  (cost=23053.91..23053.92 rows=1 width=96) (actual time=9600.829..9607.754 rows=1 loops=1)
+  ->  Gather  (cost=1008.92..23053.90 rows=1 width=48) (actual time=936.335..9607.661 rows=36 loops=1)
+        Workers Planned: 1
+        Workers Launched: 1
+        ->  Nested Loop  (cost=8.92..22053.80 rows=1 width=48) (actual time=1801.297..9372.225 rows=18 loops=2)
+              ->  Nested Loop  (cost=8.49..15638.89 rows=3406 width=37) (actual time=3.024..5933.423 rows=133210 loops=2)
+                    Join Filter: (t.id = ci.movie_id)
+                    ->  Nested Loop  (cost=8.05..12167.82 rows=98 width=41) (actual time=2.646..202.490 rows=3190 loops=2)
+                          ->  Nested Loop  (cost=7.62..11898.55 rows=149 width=21) (actual time=2.358..136.012 rows=25812 loops=2)
+                                ->  Parallel Seq Scan on keyword k  (cost=0.00..4499.85 rows=5 width=21) (actual time=0.158..14.570 rows=4 loops=2)
+                                      Filter: (keyword = ANY ('{superhero,sequel,second-part,marvel-comics,based-on-comic,tv-special,fight,violence}'::text[]))
+                                      Rows Removed by Filter: 118310
+                                ->  Bitmap Heap Scan on movie_keyword mk  (cost=7.62..1475.63 rows=411 width=8) (actual time=1.186..29.129 rows=6453 loops=8)
+                                      Recheck Cond: (keyword_id = k.id)
+                                      Heap Blocks: exact=17767
+                                      ->  Bitmap Index Scan on movie_keyword_idx_keywordid  (cost=0.00..7.51 rows=411 width=0) (actual time=0.656..0.656 rows=6453 loops=8)
+                                            Index Cond: (keyword_id = k.id)
+                          ->  Index Scan using title_pkey on title t  (cost=0.43..1.81 rows=1 width=20) (actual time=0.002..0.002 rows=0 loops=51625)
+                                Index Cond: (id = mk.movie_id)
+                                Filter: (production_year > 2000)
+                                Rows Removed by Filter: 0
+                    ->  Index Scan using cast_info_idx_mid on cast_info ci  (cost=0.44..34.98 rows=35 width=8) (actual time=0.135..1.780 rows=42 loops=6380)
+                          Index Cond: (movie_id = mk.movie_id)
+              ->  Index Scan using name_pkey on name n  (cost=0.43..1.88 rows=1 width=19) (actual time=0.025..0.025 rows=0 loops=266419)
+                    Index Cond: (id = ci.person_id)
+                    Filter: (name ~~ '%Downey%Robert%'::text)
+                    Rows Removed by Filter: 1
+Planning Time: 0.665 ms
+Execution Time: 9607.797 ms

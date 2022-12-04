@@ -1,0 +1,32 @@
+Aggregate  (cost=72028.00..72028.01 rows=1 width=32) (actual time=138.347..141.948 rows=1 loops=1)
+  ->  Nested Loop  (cost=1001.17..72028.00 rows=1 width=16) (actual time=138.344..141.944 rows=0 loops=1)
+        ->  Nested Loop  (cost=1001.03..72027.84 rows=1 width=20) (actual time=138.343..141.943 rows=0 loops=1)
+              ->  Nested Loop  (cost=1000.59..72025.02 rows=1 width=24) (actual time=138.343..141.943 rows=0 loops=1)
+                    ->  Gather  (cost=1000.16..72016.57 rows=1 width=4) (actual time=138.343..141.940 rows=0 loops=1)
+                          Workers Planned: 2
+                          Workers Launched: 2
+                          ->  Nested Loop  (cost=0.16..71016.47 rows=1 width=4) (actual time=128.190..128.192 rows=0 loops=3)
+                                ->  Parallel Seq Scan on movie_companies mc  (cost=0.00..71013.24 rows=30 width=8) (actual time=2.813..127.857 rows=622 loops=3)
+                                      Filter: ((note ~~ '%(VHS)%'::text) AND (note ~~ '%(USA)%'::text) AND (note ~~ '%(1994)%'::text))
+                                      Rows Removed by Filter: 1652143
+                                ->  Memoize  (cost=0.16..0.86 rows=1 width=4) (actual time=0.000..0.000 rows=0 loops=1866)
+                                      Cache Key: mc.company_type_id
+                                      Cache Mode: logical
+                                      Hits: 654  Misses: 1  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                      Worker 0:  Hits: 613  Misses: 1  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                      Worker 1:  Hits: 596  Misses: 1  Evictions: 0  Overflows: 0  Memory Usage: 1kB
+                                      ->  Index Scan using company_type_pkey on company_type ct  (cost=0.15..0.85 rows=1 width=4) (actual time=0.146..0.146 rows=0 loops=3)
+                                            Index Cond: (id = mc.company_type_id)
+                                            Filter: ((kind)::text = 'production companies'::text)
+                                            Rows Removed by Filter: 1
+                    ->  Index Scan using title_pkey on title t  (cost=0.43..8.45 rows=1 width=20) (never executed)
+                          Index Cond: (id = mc.movie_id)
+                          Filter: (production_year > 2010)
+              ->  Index Scan using movie_info_idx_mid on movie_info mi  (cost=0.44..2.80 rows=2 width=8) (never executed)
+                    Index Cond: (movie_id = t.id)
+                    Filter: (info = ANY ('{USA,America}'::text[]))
+        ->  Index Only Scan using info_type_pkey on info_type it  (cost=0.14..0.16 rows=1 width=4) (never executed)
+              Index Cond: (id = mi.info_type_id)
+              Heap Fetches: 0
+Planning Time: 0.655 ms
+Execution Time: 141.983 ms

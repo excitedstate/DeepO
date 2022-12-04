@@ -1,2 +1,0 @@
-/*+ SeqScan(mk)  */ explain select count(*) from movie_keyword mk where  mk.keyword_id = 18559;
-/*+ IndexScan(mk)  */ explain select count(*) from movie_keyword mk where  mk.keyword_id = 18559;

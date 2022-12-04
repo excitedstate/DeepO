@@ -3,12 +3,20 @@
 """
 import functools
 import json
+import logging
 import os
+import queue
+import threading
 
-from src.one_step_embedding import Embedding
-from src.parse_query_plan import QueryPlan, QueryPlanNode, CostInfo
-from src.basic import PostgresDB
-from src.config import DB_LAB_VM_CONFIG, DATA_PATH_PLANS_FOR_TRAIN
+import tqdm
+
+from src.basic import PostgresDB, GeneralLogger
+from src.config import DB_LAB_VM_CONFIG, DATA_PATH_PLANS_FOR_TRAIN, DATA_PATH_NPY, LC_SQL_CSV_FOR_TEST, DATA_PATH, \
+    DATA_PATH_LC_SQL_TRAIN_CSV, DATA_PATH_OUTPUT
+from src.cost_learner import CostLearner
+
+TestLogger = GeneralLogger(name="test", stdout_flag=True, stdout_level=logging.INFO,
+                           file_mode="a")
 
 
 def test_1():
@@ -145,6 +153,7 @@ def test_5():
     #     qp = QueryPlan(query_plan_file.read())
     #     qp.pre_order()
     #     qp.make_digraph(draw=True)
+    from src.query_plan import QueryPlan
 
     for file_name in os.listdir(DATA_PATH_PLANS_FOR_TRAIN):
         with open(os.path.join(DATA_PATH_PLANS_FOR_TRAIN, file_name)) as query_plan_file:
@@ -173,8 +182,101 @@ def test_5():
 
 
 def test_6():
+    from src.embedding import Embedding
     Embedding().flow()
 
 
+def test_7():
+    from src.cost_learner import NetTrainer
+    nt = NetTrainer(
+        os.path.join(DATA_PATH_NPY, "cost_learner_x.npy"),
+        os.path.join(DATA_PATH_NPY, "cost_learner_y.npy"),
+        epochs=10
+    )
+    nt.flow(plot=True)
+
+
+def get_train_data():
+    os.makedirs(DATA_PATH_PLANS_FOR_TRAIN, exist_ok=True)
+
+    filename = "scale"
+    scale_sql_path = os.path.join(LC_SQL_CSV_FOR_TEST, f"workloads\\{filename}.sql")
+    output_dir = os.path.join(DATA_PATH, f"{filename}_plan")
+    os.makedirs(output_dir, 0o777, True)
+    q = queue.Queue()
+
+    def __inner_thread(tid):
+        db = PostgresDB(_config=DB_LAB_VM_CONFIG)
+        while not q.empty():
+            try:
+                idx, sql = q.get_nowait()
+                TestLogger.info(f"{idx}: {sql.strip()}")
+                _plan = db.get_query_plan(sql)
+                if isinstance(_plan, tuple):
+                    # # 获取成功 写入文件
+                    with open(os.path.join(output_dir, f'{filename}-{idx}'), "w", encoding="utf-8") as _out_f:
+                        _out_f.write("\n".join(tuple(zip(*_plan))[0]))
+            except queue.Empty:
+                TestLogger.info(f"thread {tid} executed over!")
+                break
+            except Exception as e:
+                TestLogger.warning(f"thread {tid} e: {e}, ignore")
+                continue
+
+    with open(scale_sql_path, "r", encoding="utf-8") as f:
+        for i, s in enumerate(f):
+            q.put((i, s))
+        threads = [threading.Thread(target=__inner_thread, args=(tid,)) for tid in range(10)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+
+def test_8():
+    from src.embedding import Embedding
+    from src.cost_learner import NetTrainer
+    data_x, data_y = Embedding().flow()
+
+    nt = NetTrainer(
+        data_x,
+        data_y,
+        epochs=10
+    )
+    nt.flow(plot=True)
+
+
+def test_9():
+    """
+
+    """
+    from src.hint_generate import CostEstimation
+    # for i in range(100):
+    #     ce = CostEstimation.load_from(i)
+    #     print(ce.query_plans)
+    # for i in range(100):
+    ce = CostEstimation.load_from(7)
+    res = ce.predict_costs()
+    for plan in ce.query_plans:
+        plan.post_order()
+        print(plan)
+    sorted_res = sorted(range(len(res)), key=lambda i: (res[i]['mean'], -res[i]['std']), reverse=True)
+    for i in sorted_res:
+        print(res[i]['std'], res[i]['mean'], res[i]['inverse_function'](res[i]['mean']))
+    print(sorted_res)
+    # for plan in ce.query_plans:
+    #     plan.post_order()
+    #     print()
+    # print(ce.query_plans)
+
+
+def test_10():
+    """
+        todo 重新计算, ...
+    """
+    # CostLearner.test_all()
+    pass
+
+
 if __name__ == '__main__':
-    test_6()
+    test_9()

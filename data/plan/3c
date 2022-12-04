@@ -1,0 +1,27 @@
+Finalize Aggregate  (cost=24708.35..24708.36 rows=1 width=32) (actual time=264.990..265.057 rows=1 loops=1)
+  ->  Gather  (cost=24708.24..24708.35 rows=1 width=32) (actual time=264.982..265.050 rows=2 loops=1)
+        Workers Planned: 1
+        Workers Launched: 1
+        ->  Partial Aggregate  (cost=23708.24..23708.25 rows=1 width=32) (actual time=178.619..178.621 rows=1 loops=2)
+              ->  Nested Loop  (cost=8.51..23706.24 rows=801 width=16) (actual time=4.330..178.455 rows=447 loops=2)
+                    Join Filter: (t.id = mi.movie_id)
+                    ->  Nested Loop  (cost=8.05..22989.83 rows=346 width=24) (actual time=1.342..21.874 rows=514 loops=2)
+                          ->  Nested Loop  (cost=7.62..22775.50 rows=446 width=4) (actual time=1.293..15.732 rows=7025 loops=2)
+                                ->  Parallel Seq Scan on keyword k  (cost=0.00..3455.90 rows=14 width=4) (actual time=0.792..9.232 rows=20 loops=2)
+                                      Filter: (keyword ~~ '%sequel%'::text)
+                                      Rows Removed by Filter: 118293
+                                ->  Bitmap Heap Scan on movie_keyword mk  (cost=7.62..1375.86 rows=411 width=8) (actual time=0.035..0.293 rows=343 loops=41)
+                                      Recheck Cond: (keyword_id = k.id)
+                                      Heap Blocks: exact=6553
+                                      ->  Bitmap Index Scan on movie_keyword_idx_keywordid  (cost=0.00..7.51 rows=411 width=0) (actual time=0.017..0.017 rows=343 loops=41)
+                                            Index Cond: (keyword_id = k.id)
+                          ->  Index Scan using title_pkey on title t  (cost=0.43..0.48 rows=1 width=20) (actual time=0.001..0.001 rows=0 loops=14050)
+                                Index Cond: (id = mk.movie_id)
+                                Filter: (production_year > 1990)
+                                Rows Removed by Filter: 0
+                    ->  Index Scan using movie_info_idx_mid on movie_info mi  (cost=0.46..2.05 rows=2 width=4) (actual time=0.243..0.305 rows=1 loops=1027)
+                          Index Cond: (movie_id = mk.movie_id)
+                          Filter: (info = ANY ('{Sweden,Norway,Germany,Denmark,Swedish,Denish,Norwegian,German,USA,American}'::text[]))
+                          Rows Removed by Filter: 43
+Planning Time: 0.503 ms
+Execution Time: 265.089 ms

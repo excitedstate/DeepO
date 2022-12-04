@@ -136,20 +136,23 @@ class PostgresDB:
 
             _cur.execute(_sql)
             _res = _cur.fetchall()
+            self._conn.commit()
 
             return tuple(_res)
         except Exception as e:
             BasicLogger.exception(f"failed to execute sql, exception {e.__doc__}, sql: {_sql}")
+            self._conn.rollback()
 
-    def get_query_plan(self, _query_sql: str) -> typing.Tuple[typing.Tuple[str]]:
+    def get_query_plan(self, _query_sql: str, _command="EXPLAIN ANALYSE") -> typing.Tuple[typing.Tuple[str]]:
         """
             获取执行计划
         Args:
             _query_sql: 应该是一个SQL QUERY
+            _command: 选择EXPLAIN ANALYSE 还是 EXPLAIN
         Returns: Plan
         """
-        assert not (_query_sql.startswith("EXPLAIN") or _query_sql.startswith("explain")), "sql starts with 'analyse'"
-        return self.execute("EXPLAIN ANALYSE {}".format(_query_sql))
+        assert not (_query_sql.startswith("EXPLAIN") or _query_sql.startswith("explain")), "sql starts with 'explain'"
+        return self.execute(f"{_command} {_query_sql}")
 
     @staticmethod
     def test_get_query_plan(_sql_with_hints_path=DATA_PATH_PLANS_FOR_TRAIN,

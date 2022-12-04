@@ -1,9 +1,0 @@
-Finalize Aggregate  (cost=477664.73..477664.74 rows=1 width=8)
-  ->  Gather  (cost=477664.52..477664.73 rows=2 width=8)
-        Workers Planned: 2
-        ->  Partial Aggregate  (cost=476664.52..476664.53 rows=1 width=8)
-              ->  Parallel Seq Scan on movie_info mi  (cost=0.00..470311.88 rows=2541056 width=0)
-                    Filter: (info_type_id > 16)
-JIT:
-  Functions: 6
-  Options: Inlining false, Optimization false, Expressions true, Deforming true

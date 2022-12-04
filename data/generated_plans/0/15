@@ -1,7 +1,0 @@
-Aggregate  (cost=2205.37..2205.38 rows=1 width=8)
-  ->  Nested Loop  (cost=0.43..2204.75 rows=248 width=0)
-        ->  Seq Scan on movie_info_idx mi_idx  (cost=0.00..19.75 rows=260 width=4)
-              Filter: (info_type_id > 99)
-        ->  Index Scan using title_pkey on title t  (cost=0.43..8.40 rows=1 width=4)
-              Index Cond: (id = mi_idx.movie_id)
-              Filter: (kind_id = 7)

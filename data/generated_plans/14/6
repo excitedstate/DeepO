@@ -1,9 +1,0 @@
-Aggregate  (cost=10035063225.96..10035063225.97 rows=1 width=8)
-  ->  Nested Loop  (cost=10000000000.44..10034904546.95 rows=63471604 width=0)
-        ->  Seq Scan on title t  (cost=0.00..89376.00 rows=3299780 width=4)
-              Filter: (kind_id > 1)
-        ->  Index Scan using cast_info_idx_mid on cast_info ci  (cost=0.44..10.20 rows=35 width=4)
-              Index Cond: (movie_id = t.id)
-JIT:
-  Functions: 7
-  Options: Inlining true, Optimization true, Expressions true, Deforming true

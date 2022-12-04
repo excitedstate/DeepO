@@ -1,9 +1,0 @@
-Finalize Aggregate  (cost=224340.04..224340.05 rows=1 width=8)
-  ->  Gather  (cost=224339.82..224340.03 rows=2 width=8)
-        Workers Planned: 2
-        ->  Partial Aggregate  (cost=223339.82..223339.83 rows=1 width=8)
-              ->  Parallel Index Scan using title_idx_year on title t  (cost=0.43..221344.38 rows=798178 width=0)
-                    Index Cond: (production_year > 2004)
-JIT:
-  Functions: 6
-  Options: Inlining false, Optimization false, Expressions true, Deforming true
