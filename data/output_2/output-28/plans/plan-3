@@ -1,0 +1,15 @@
+/*+ IndexScan(t) IndexScan(mk) HashJoin(mk t) Leading (( t mk )) */ explain select count(*) from title t, movie_keyword mk where t.id=mk.movie_id and mk.keyword_id = 20450;
+
+Finalize Aggregate  (cost=516448.69..516448.70 rows=1 width=8)
+  ->  Gather  (cost=516448.48..516448.69 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=515448.48..515448.49 rows=1 width=8)
+              ->  Parallel Hash Join  (cost=149926.09..515448.12 rows=144 width=0)
+                    Hash Cond: (t.id = mk.movie_id)
+                    ->  Parallel Index Scan using title_pkey on title t  (cost=0.43..114584.36 rows=1375000 width=4)
+                    ->  Parallel Hash  (cost=149923.86..149923.86 rows=144 width=4)
+                          ->  Parallel Index Scan using movie_keyword_idx_mid on movie_keyword mk  (cost=0.43..149923.86 rows=144 width=4)
+                                Filter: (keyword_id = 20450)
+JIT:
+  Functions: 15
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

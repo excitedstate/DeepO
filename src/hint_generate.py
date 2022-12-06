@@ -37,7 +37,9 @@ class SQLWithHintsGenerator:
             生成Scan Hint: Seq Scan 和 Index Scan
             tables形如: ["person p", "table t"]
         """
-        scan_methods = ["SeqScan({})", "IndexScan({})"]
+        scan_methods = ["SeqScan({})", "IndexScan({})",
+                        # "BitmapScan({})"
+                        ]
         hint_candidate = []
         for table in self.tables:
             # # 取别名
@@ -191,11 +193,13 @@ class SQLWithHintsGenerator:
             raise StopIteration
 
     @staticmethod
-    def test():
+    def test(output_dir_parent=None):
+        if output_dir_parent is None:
+            output_dir_parent = DATA_PATH_OUTPUT
         for idx, (query_with_hint, sql) in enumerate(tqdm(SQLWithHintsGenerator(DATA_PATH_LC_SQL_TRAIN_CSV))):
             if idx > 100:
                 break
-            output_dir = os.path.join(DATA_PATH_OUTPUT, f"output-{idx}")
+            output_dir = os.path.join(output_dir_parent, f"output-{idx}")
             os.makedirs(output_dir, exist_ok=True)
             with open(os.path.join(output_dir, f"{idx}a.sql"), "w", encoding="utf-8") as f:
                 f.write(sql)
@@ -249,8 +253,10 @@ class CostEstimation:
         return costs
 
     @staticmethod
-    def load_from(idx: int):
-        test_dir = os.path.join(DATA_PATH_OUTPUT, f"output-{idx}")
+    def load_from(idx: int, output_dir_parent=None):
+        if output_dir_parent is None:
+            output_dir_parent = DATA_PATH_OUTPUT
+        test_dir = os.path.join(output_dir_parent, f"output-{idx}")
         with open(os.path.join(test_dir, f"{idx}a.sql"), "r", encoding="utf-8") as f:
             sql = f.read()
         with open(os.path.join(test_dir, f"{idx}b.sql"), "r", encoding="utf-8") as f:

@@ -1,0 +1,1 @@
+explain select count(*) from title t, cast_info ci, movie_info_idx mi_idx where t.id=ci.movie_id and t.id=mi_idx.movie_id and ci.role_id > 3;

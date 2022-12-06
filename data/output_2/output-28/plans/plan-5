@@ -1,0 +1,19 @@
+/*+ SeqScan(t) SeqScan(mk) MergeJoin(t mk) Leading (( mk t )) */ explain select count(*) from title t, movie_keyword mk where t.id=mk.movie_id and mk.keyword_id = 20450;
+
+Finalize Aggregate  (cost=633803.73..633803.74 rows=1 width=8)
+  ->  Gather  (cost=633803.51..633803.72 rows=2 width=8)
+        Workers Planned: 2
+        ->  Partial Aggregate  (cost=632803.51..632803.52 rows=1 width=8)
+              ->  Merge Join  (cost=608051.52..632803.15 rows=144 width=0)
+                    Merge Cond: (mk.movie_id = t.id)
+                    ->  Sort  (cost=79396.95..79397.31 rows=144 width=4)
+                          Sort Key: mk.movie_id
+                          ->  Parallel Seq Scan on movie_keyword mk  (cost=0.00..79391.79 rows=144 width=4)
+                                Filter: (keyword_id = 20450)
+                    ->  Materialize  (cost=528654.57..545154.57 rows=3300000 width=4)
+                          ->  Sort  (cost=528654.57..536904.57 rows=3300000 width=4)
+                                Sort Key: t.id
+                                ->  Seq Scan on title t  (cost=0.00..81126.00 rows=3300000 width=4)
+JIT:
+  Functions: 15
+  Options: Inlining true, Optimization true, Expressions true, Deforming true

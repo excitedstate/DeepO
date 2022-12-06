@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 
 from src.basic import GeneralLogger
-from src.config import DATA_PATH_MODEL, DATA_PATH_PIC, DATA_PATH_PKL
+from src.config import DATA_PATH_MODEL, DATA_PATH_PIC, DATA_PATH_PKL, DATA_PATH
 from src.query_plan import QueryPlanNode, QueryPlan
 
 from src.embedding import Embedding, EmbeddingNet4Nodes
@@ -141,6 +141,17 @@ class CostLearner:
         _out = self.cost_learner_net(torch.tensor(embedded_vec, dtype=torch.float32).unsqueeze(0))
         return _out.detach().numpy()[0][0]
 
+    def embed(self, qp: typing.Union[typing.List[typing.List[str]], QueryPlan], need_cost_label: bool = False):
+        node_list = self.get_node_list_of_query_plan(qp) if isinstance(qp, QueryPlan) else qp
+        # # 2. 做查询计划嵌入, 节点中的每一个词
+        plan_seq = Embedding.vectorize_sentences(list(map(lambda x: x[:-1], node_list)),
+                                                 self.vocab_encode_mapping)
+        # # 扩充
+        plan_seq = pad_sequences(plan_seq, padding="post", dtype=np.float32,
+                                 maxlen=self.embedding_net.model.input_shape[1])
+        embedded_vector = self.embedding_net(plan_seq)
+        return (embedded_vector, 0) if not need_cost_label else (embedded_vector, node_list[-1][-1])
+
     @staticmethod
     def get_node_list_of_query_plan(qp: QueryPlan):
         def __callback(cur_node: QueryPlanNode, _list: list):
@@ -196,17 +207,6 @@ class CostLearner:
             inverse_function=lambda cost: 5346925.973 - float(cost) * 5346925.973
         )
 
-    def embed(self, qp: typing.Union[typing.List[typing.List[str]], QueryPlan], need_cost_label: bool = False):
-        node_list = self.get_node_list_of_query_plan(qp) if isinstance(qp, QueryPlan) else qp
-        # # 2. 做查询计划嵌入, 节点中的每一个词
-        plan_seq = Embedding.vectorize_sentences(list(map(lambda x: x[:-1], node_list)),
-                                                 self.vocab_encode_mapping)
-        # # 扩充
-        plan_seq = pad_sequences(plan_seq, padding="post", dtype=np.float32,
-                                 maxlen=self.embedding_net.model.input_shape[1])
-        embedded_vector = self.embedding_net(plan_seq)
-        return embedded_vector, 0 if not need_cost_label else (embedded_vector, node_list[-1][-1])
-
     @staticmethod
     def test_single():
         query_plan_path = r"C:\Users\QQ863\Documents\Projects\PycharmProjects\DeepO\data\plan\5c"
@@ -222,7 +222,7 @@ class CostLearner:
         return c
 
     @staticmethod
-    def test_all():
+    def get_width_of_confidence_intervals():
         """
             结果
             |p|满足条件的比例|
@@ -253,16 +253,35 @@ class CostLearner:
             |29| 0.9734513274336283|
         """
         from src.config import DATA_PATH_PLANS_FOR_TRAIN
-        # # 加载查询计划
+        # 加载查询计划
         qp_list = []
-        for query_plan_path in os.listdir(DATA_PATH_PLANS_FOR_TRAIN):
-            full_name = os.path.join(DATA_PATH_PLANS_FOR_TRAIN, query_plan_path)
-            with open(full_name, "r", encoding="utf-8") as f:
-                qp = Embedding.load_from(_query_plan_raw=f.read())
-                qp_list.append(qp)
+        for _dir in [os.path.join(DATA_PATH, "synthetic_plan"), DATA_PATH_PLANS_FOR_TRAIN]:
+            for query_plan_path in os.listdir(_dir):
+                full_name = os.path.join(_dir, query_plan_path)
+                with open(full_name, "r", encoding="utf-8") as f:
+                    qp = Embedding.load_from(_query_plan_raw=f.read())
+                    qp_list.append(qp)
 
         c = CostLearner.default_factory()
-        # # 计算ci_multiplier: 29
-        for p in range(6, 30):
-            ans = list(map(lambda qp: c.predict_cost_and_get_confidence_intervals(qp, ci_multiplier=p)['ans'], qp_list))
-            print(p, len(list(filter(bool, ans))) / len(ans))
+        # 计算ci_multiplier: 29
+
+        res = list(map(lambda qp: c.predict_cost_and_get_confidence_intervals(qp, ci_multiplier=0), qp_list))
+        np.save('res', res)
+        # # 计算
+        max_p = 40
+        # res = np.load('res.npy', allow_pickle=True)
+        res_ratio = {p: len(list(filter(lambda qp_res: abs(abs(qp_res['diff']) <= qp_res['std'] * p), res))) / len(res)
+                     for p in
+                     range(max_p)}
+        for p, v in res_ratio.items():
+            if v > 0.9:
+                return res, res_ratio, p
+        # for p in range(6, 30):
+        #     print()
+        # for p in range(6, 30):
+        #     ans = list(map(lambda qp: c.predict_cost_and_get_confidence_intervals(qp, ci_multiplier=p)['ans'], qp_list))
+        #
+        #     # print(p, len(list(filter(bool, ans))) / len(ans))
+        #     if len(list(filter(bool, ans))) / len(ans) > 0.95:
+        #         return p
+        return res, res_ratio, max_p

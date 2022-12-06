@@ -1,0 +1,1 @@
+explain select count(*) from title t, movie_info mi where t.id=mi.movie_id and t.kind_id = 1 and t.production_year = 1993 and mi.info_type_id > 3;

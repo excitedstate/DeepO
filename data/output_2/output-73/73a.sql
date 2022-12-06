@@ -1,0 +1,1 @@
+explain select count(*) from movie_keyword mk where  mk.keyword_id = 73864;

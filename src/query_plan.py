@@ -713,8 +713,8 @@ class QueryPlan:
             if node.right is not None:
                 g.add_edge(node.id, node.right.id)
         if draw:
-            plt.title('draw_networkx')
-            pos = nx.drawing.nx_agraph.graphviz_layout(g, prog='neato')
+            plt.title('query plan structure')
+            pos = nx.drawing.nx_agraph.graphviz_layout(g, prog='dot')
             nx.draw(g, pos, with_labels=True, arrows=True, node_size=500)
             plt.show()
             plt.savefig('nx_test.png')

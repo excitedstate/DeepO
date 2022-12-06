@@ -1,0 +1,1 @@
+explain select count(*) from title t, movie_info_idx mi_idx where t.id=mi_idx.movie_id and t.kind_id = 7;

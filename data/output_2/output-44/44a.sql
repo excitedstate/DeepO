@@ -1,0 +1,1 @@
+explain select count(*) from title t, movie_info mi, movie_keyword mk where t.id=mi.movie_id and t.id=mk.movie_id ;

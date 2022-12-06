@@ -8,6 +8,7 @@ import os
 import queue
 import threading
 
+import rich
 import tqdm
 
 from src.basic import PostgresDB, GeneralLogger
@@ -251,19 +252,33 @@ def test_9():
 
     """
     from src.hint_generate import CostEstimation
+    from src.query_plan import QueryPlan, QueryPlanNode
     # for i in range(100):
     #     ce = CostEstimation.load_from(i)
     #     print(ce.query_plans)
     # for i in range(100):
-    ce = CostEstimation.load_from(7)
+    ce = CostEstimation.load_from(28, "data/output_2")
     res = ce.predict_costs()
     for plan in ce.query_plans:
         plan.post_order()
         print(plan)
     sorted_res = sorted(range(len(res)), key=lambda i: (res[i]['mean'], -res[i]['std']), reverse=True)
+
+    def callback(cur_node: QueryPlanNode):
+        # _layer = '\t' * cur_node.layer
+        print(
+            f"id: {cur_node.id:02d}, parent: {cur_node.parent.id if cur_node.parent is not None else 0:02d}, layer: {cur_node.layer}, vector: {list(cur_node.to_vector())}")
+
+    print("sorted data: ")
     for i in sorted_res:
-        print(res[i]['std'], res[i]['mean'], res[i]['inverse_function'](res[i]['mean']))
-    print(sorted_res)
+        print(
+            f"std: {res[i]['std']:06f}, mean: {res[i]['mean']:06f}, real cost: {res[i]['inverse_function'](res[i]['mean']):06f}")
+    print("sorted index: ", sorted_res)
+    for i, idx in enumerate(sorted_res[:3]):
+        print(f"top {i}: {idx}")
+        print(f"sql with hint: {ce.sql_with_hints[idx].strip()}")
+        print(f"query plan:")
+        ce.query_plans[idx].post_order(callback)
     # for plan in ce.query_plans:
     #     plan.post_order()
     #     print()
@@ -271,12 +286,20 @@ def test_9():
 
 
 def test_10():
-    """
-        todo 重新计算, ...
-    """
-    # CostLearner.test_all()
-    pass
+    *_, res_ratio, p = CostLearner.get_width_of_confidence_intervals()
+    print(p)
+    for key, value in res_ratio:
+        print(key, value, sep=",")
+    rich.print(res_ratio)
+
+
+def test_11():
+    from src.hint_generate import SQLWithHintsGenerator
+
+    SQLWithHintsGenerator.test("data/output_2")
 
 
 if __name__ == '__main__':
+    # test_11()
+    # test_10()
     test_9()

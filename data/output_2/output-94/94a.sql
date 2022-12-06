@@ -1,0 +1,1 @@
+explain select count(*) from movie_info mi where  mi.info_type_id < 18;

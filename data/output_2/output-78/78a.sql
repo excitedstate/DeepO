@@ -1,0 +1,1 @@
+explain select count(*) from title t, cast_info ci where t.id=ci.movie_id ;

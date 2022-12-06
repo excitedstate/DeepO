@@ -1,0 +1,1 @@
+explain select count(*) from title t, cast_info ci, movie_info mi where t.id=ci.movie_id and t.id=mi.movie_id and t.kind_id = 7 and t.production_year > 1998 and mi.info_type_id < 15;
