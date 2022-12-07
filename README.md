@@ -31,6 +31,19 @@
     被设计为可不断学习且需要重复训练的查询优化器，在训练数据较少的情况下，模型可能会对特定的的常数值产生依赖而影响后续的学习过程；
 > - 修改作者对叶子节点和非叶节点分别处理、分别编码的过程，将它们统一为相同的查询计划节点描述，并在查询计划嵌入时考虑节点所处的位置。
 
+## 代码目录
+
+
+|            目录或文件	            |      简介       |                          	目录或文件                          |     	简介     |
+|:----------------------------:|:-------------:|:--------------------------------------------------------:|:-----------:|
+|  [data/model](data/model)	   |   保存生成的模型	    |             [src/config.py](src/config.py)	              |   存储配置信息    |
+|    [data/npy](data/npy)	     |    保存训练数据	    |         [src/query_plan.py](src/query_plan.py)	          |   查询计划格式化   |
+|  [data/output](data/output)  |  	保存查询计划输出结果  |          [src/embedding.py](src/embedding.py)	           |   查询计划嵌入    |
+|    [data/pic](data/pic)	     |  保存项目所需要的图像   |       [src/cost_learner.py](src/cost_learner.py)	        |  代价估计模型训练   |
+|    [data/pkl](data/pkl)	     | 保存pickle序列化对象 | [src/extract_table_names.py](src/extract_table_names.py) | 	获取SQL语句中的表 |
+|   [data/*plan](data/plan)    |  	保存训练用查询计划   |      [src/hint_generate.py](src/hint_generate.py)	       |  获取优化查询计划   |
+| [src/basic.py](src/basic.py) | 	数据库连接类和日志类	  |                   [main.py](main.py)	                    |  测试已实现的功能   |
+
 ## 运行
 
 ### 数据库和训练环境准备
@@ -82,11 +95,11 @@
 2. 函数`query_optimization_demo`用于执行以下SQL语句的查询优化
 
 ```sql
-    select count(*)
-    from title t,
-         movie_keyword mk
-    where t.id = mk.movie_id
-      and mk.keyword_id = 20450;
+select count(*)
+from title t,
+     movie_keyword mk
+where t.id = mk.movie_id
+  and mk.keyword_id = 20450;
 ```
 
 ## 部分截图
@@ -96,7 +109,7 @@
 #### sql语句
 
 ```sql
- /*+ SeqScan(t) SeqScan(mi) SeqScan(mi_idx) MergeJoin(t mi_idx) MergeJoin(mi t mi_idx) Leading (( mi ( t mi_idx ) )) */
+/*+ SeqScan(t) SeqScan(mi) SeqScan(mi_idx) MergeJoin(t mi_idx) MergeJoin(mi t mi_idx) Leading (( mi ( t mi_idx ) )) */
 EXPLAIN ANALYSE
 SELECT COUNT(*)
 FROM title t,
