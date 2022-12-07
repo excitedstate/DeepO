@@ -1,1 +1,0 @@
-explain select count(*) from title t, cast_info ci, movie_keyword mk where t.id=ci.movie_id and t.id=mk.movie_id and ci.person_id > 3028889 and mk.keyword_id = 6079;

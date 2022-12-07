@@ -1,1 +1,0 @@
-explain select count(*) from title t, movie_companies mc where t.id=mc.movie_id ;

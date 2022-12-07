@@ -1,1 +1,0 @@
-explain select count(*) from title t, movie_companies mc where t.id=mc.movie_id and t.kind_id > 1 and t.production_year < 2010 and mc.company_type_id < 2;

@@ -1,1 +1,0 @@
-explain select count(*) from title t where  t.kind_id = 1;

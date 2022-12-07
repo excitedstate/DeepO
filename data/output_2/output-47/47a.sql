@@ -1,1 +1,0 @@
-explain select count(*) from title t, movie_info mi where t.id=mi.movie_id and t.production_year = 1913 and mi.info_type_id = 7;
