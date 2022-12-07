@@ -30,7 +30,7 @@ DB_CONFIGS = {
         "db": "postgres"
     },
     "db_lab_vm_bing": {
-        "host": "192.168.72.128",
+        "host": "xx.xx.xx.xx",
         "user": "postgres",
         "db": "imdbload"
     }

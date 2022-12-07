@@ -1,9 +1,7 @@
 .idea
 .vscode
 data/log
-data/pkl
 data/others
-data/npy
 data/txt
 data/scale_plan
 data/synthetic_plan
