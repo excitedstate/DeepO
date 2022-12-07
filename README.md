@@ -42,9 +42,7 @@
    按照该项目[`README`](https://github.com/concretevitamin/join-order-benchmark/blob/master/README.md)的步骤载入`IMDB`
    数据库
 5. `JOB`中提供了一部分训练数据, 载入完成后, 如果索引有问题，请执行`fkindexes.sql`修复
-6.
-
-训练数据的另一部分来自项目[`learnedcardinalities/workloads`](https://github.com/andreaskipf/learnedcardinalities/tree/master/workloads),
+6. 训练数据的另一部分来自项目[`learnedcardinalities/workloads`](https://github.com/andreaskipf/learnedcardinalities/tree/master/workloads),
 您可以下载该项目或者仅下载负载
 
 ### `Python3`安装和环境配置
